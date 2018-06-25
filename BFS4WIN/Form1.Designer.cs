@@ -48,16 +48,14 @@
             this.columnHeader15 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader16 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader17 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader18 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
-            this.button7 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
             this.button9 = new System.Windows.Forms.Button();
             this.button10 = new System.Windows.Forms.Button();
-            this.button11 = new System.Windows.Forms.Button();
-            this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label3 = new System.Windows.Forms.Label();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
@@ -70,6 +68,9 @@
             this.label7 = new System.Windows.Forms.Label();
             this.textBox8 = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.memLimit = new System.Windows.Forms.NumericUpDown();
+            ((System.ComponentModel.ISupportInitialize)(this.memLimit)).BeginInit();
             this.SuspendLayout();
             // 
             // listView1
@@ -220,6 +221,11 @@
             this.columnHeader17.Text = "Stagger";
             this.columnHeader17.Width = 93;
             // 
+            // columnHeader10
+            // 
+            this.columnHeader10.Text = "StartSector";
+            this.columnHeader10.Width = 96;
+            // 
             // columnHeader18
             // 
             this.columnHeader18.Text = "Status";
@@ -231,40 +237,31 @@
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(165, 23);
             this.button4.TabIndex = 8;
-            this.button4.Text = "Add File";
+            this.button4.Text = "Upload File";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(183, 437);
+            this.button5.Location = new System.Drawing.Point(354, 437);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(165, 23);
             this.button5.TabIndex = 9;
-            this.button5.Text = "Delete File";
+            this.button5.Text = "Delete Last File";
             this.button5.UseVisualStyleBackColor = true;
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(354, 437);
+            this.button6.Location = new System.Drawing.Point(12, 466);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(165, 23);
             this.button6.TabIndex = 10;
-            this.button6.Text = "Copy File";
+            this.button6.Text = "Download Selected File";
             this.button6.UseVisualStyleBackColor = true;
-            // 
-            // button7
-            // 
-            this.button7.Location = new System.Drawing.Point(525, 437);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(165, 23);
-            this.button7.TabIndex = 11;
-            this.button7.Text = "Move File";
-            this.button7.UseVisualStyleBackColor = true;
             // 
             // button8
             // 
-            this.button8.Location = new System.Drawing.Point(12, 466);
+            this.button8.Location = new System.Drawing.Point(183, 437);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(165, 23);
             this.button8.TabIndex = 12;
@@ -277,7 +274,7 @@
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(165, 23);
             this.button9.TabIndex = 13;
-            this.button9.Text = "Plot File";
+            this.button9.Text = "Plot Selected File";
             this.button9.UseVisualStyleBackColor = true;
             // 
             // button10
@@ -286,22 +283,8 @@
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(165, 23);
             this.button10.TabIndex = 14;
-            this.button10.Text = "Merge File";
+            this.button10.Text = "Merge File Into Selected File";
             this.button10.UseVisualStyleBackColor = true;
-            // 
-            // button11
-            // 
-            this.button11.Location = new System.Drawing.Point(525, 466);
-            this.button11.Name = "button11";
-            this.button11.Size = new System.Drawing.Size(165, 23);
-            this.button11.TabIndex = 15;
-            this.button11.Text = "Split File";
-            this.button11.UseVisualStyleBackColor = true;
-            // 
-            // columnHeader10
-            // 
-            this.columnHeader10.Text = "StartSector";
-            this.columnHeader10.Width = 96;
             // 
             // label3
             // 
@@ -399,11 +382,44 @@
             this.label9.TabIndex = 26;
             this.label9.Text = "Bad Sectors";
             // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
+            this.openFileDialog1.Filter = "PoC2 plot files|*_*_*.*|PoC1 plot files|*_*_*_*.*";
+            // 
+            // memLimit
+            // 
+            this.memLimit.Increment = new decimal(new int[] {
+            128,
+            0,
+            0,
+            0});
+            this.memLimit.Location = new System.Drawing.Point(726, 440);
+            this.memLimit.Maximum = new decimal(new int[] {
+            4096,
+            0,
+            0,
+            0});
+            this.memLimit.Minimum = new decimal(new int[] {
+            128,
+            0,
+            0,
+            0});
+            this.memLimit.Name = "memLimit";
+            this.memLimit.Size = new System.Drawing.Size(62, 20);
+            this.memLimit.TabIndex = 29;
+            this.memLimit.Value = new decimal(new int[] {
+            4096,
+            0,
+            0,
+            0});
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 646);
+            this.Controls.Add(this.memLimit);
             this.Controls.Add(this.textBox8);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.textBox5);
@@ -416,11 +432,9 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.button11);
             this.Controls.Add(this.button10);
             this.Controls.Add(this.button9);
             this.Controls.Add(this.button8);
-            this.Controls.Add(this.button7);
             this.Controls.Add(this.button6);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);
@@ -435,6 +449,7 @@
             this.Name = "Form1";
             this.Text = "Johnny\'s BFSTool for Windows v.0.1";
             this.Load += new System.EventHandler(this.Form1_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.memLimit)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -462,7 +477,6 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.Button button7;
         private System.Windows.Forms.ColumnHeader columnHeader15;
         private System.Windows.Forms.ColumnHeader columnHeader16;
         private System.Windows.Forms.ColumnHeader columnHeader17;
@@ -470,7 +484,6 @@
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.Button button9;
         private System.Windows.Forms.Button button10;
-        private System.Windows.Forms.Button button11;
         private System.Windows.Forms.ColumnHeader columnHeader10;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBox2;
@@ -484,6 +497,8 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox textBox8;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.NumericUpDown memLimit;
     }
 }
 

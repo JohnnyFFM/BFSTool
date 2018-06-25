@@ -21,12 +21,12 @@ namespace BFS4WIN
         2=File is incomplete (writing or plotting)
         3=Converting to POC2
     pos: Counter value used for plotting and converting.
-    After TOC table of defect areas (888 byte):
+    After TOC table of defect areas (880 byte):
+    TotalDiskspaces (8 byte) - disk space in 4k sectors.
     Each entry (8 byte) contains: startPos(32bit), size(32bit)
     startPos: 4k sector number where the defect area starts
     size: Size of defect area as 4k sector count
     Last 8 byte of 4k TOC are:
-    Change counter(32bit)
     CRC(32bit) -> Algo is CRC32
     */
     /// </summary>
@@ -78,11 +78,11 @@ namespace BFS4WIN
             return count;
         }
 
-        public Boolean AddPlotFile(ulong id, ulong start,uint nonces,uint stagger,uint status,uint pos)
+        public int AddPlotFile(ulong id, ulong start,uint nonces,uint stagger,uint status,uint pos)
         {
             int position = PlotFileCount();
             //return false if no slot left
-            if (position == 32) return false;
+            if (position == 32) return -1;
             
             //return false if no disk space left
             ulong freespace;
@@ -97,7 +97,7 @@ namespace BFS4WIN
                 newStartPos = plotFiles[pos - 1].startPos + plotFiles[pos - 1].nonces / 64;
                 freespace = diskspace - newStartPos + 2;
             }
-            if (nonces / 64 > freespace) return false;
+            if (nonces / 64 > freespace) return -1;
 
             //add file
             plotFiles[pos].id = id;
@@ -108,7 +108,7 @@ namespace BFS4WIN
             plotFiles[pos].pos = pos;
             plotFiles[pos].startPos = newStartPos;
             UpdateCRC32();
-            return true;
+            return (int)pos;
         }
 
         public byte[] ToByteArray()
