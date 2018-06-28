@@ -22,10 +22,17 @@ namespace BFS4WIN
             End = 2
         }
 
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern Boolean SetFilePointerEx(
+            [In] SafeFileHandle hFile,
+            [In] Int64 liDistanceToMove,
+            [Out] out Int64 lpNewFilePointer,
+            [In] EMoveMethod dwMoveMethod);
+
         [DllImport("Kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         static extern uint SetFilePointer(
             [In] SafeFileHandle hFile,
-            [In] long lDistanceToMove,
+            [In] int lDistanceToMove,
             [Out] out int lpDistanceToMoveHigh,
             [In] EMoveMethod dwMoveMethod);
 
@@ -56,7 +63,7 @@ namespace BFS4WIN
         /// </param> 
         /// <param name="bytesPerSector"></param> 
         /// <returns></returns> 
-        public byte[] ReadSector(string drive, double sector, int bytesPerSector)
+        public byte[] ReadSector(string drive, Int64 sector, Int32 bytesPerSector)
         {
             short FILE_ATTRIBUTE_NORMAL = 0x80;
             short INVALID_HANDLE_VALUE = -1;
@@ -71,14 +78,19 @@ namespace BFS4WIN
             {
                 Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
             }
-            double sec = sector * bytesPerSector;
 
-            int size = int.Parse(bytesPerSector.ToString());
-            byte[] buf = new byte[size];
+            //calculate byte position
+            Int64 sec = sector * bytesPerSector;
+
+            byte[] buf = new byte[bytesPerSector];
+            Int64 filePos;
+            if (!SetFilePointerEx(handleValue, sec, out filePos, EMoveMethod.Begin))
+            {
+                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+            }
+
             int read = 0;
-            int moveToHigh;
-            SetFilePointer(handleValue, int.Parse(sec.ToString()), out moveToHigh, EMoveMethod.Begin);
-            ReadFile(handleValue, buf, size, out read, IntPtr.Zero);
+            ReadFile(handleValue, buf, bytesPerSector, out read, IntPtr.Zero);
             handleValue.Close();
             return buf;
         }

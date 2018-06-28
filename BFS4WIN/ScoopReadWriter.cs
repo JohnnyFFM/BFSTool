@@ -62,14 +62,7 @@ namespace BFS4WIN
             try
             {
                 //assert priviliges
-                if (!Privileges.HasAdminPrivileges)
-                {
-                    DialogResult dialogResult = MessageBox.Show("No elevated file creation possible. File creation will be very slow. Continue?", "Freeze Warning", MessageBoxButtons.YesNo);
-                    if (dialogResult == DialogResult.No)
-                    {
-                        Application.Exit();
-                    }
-                }
+
                 if (directIO)
                 {
                     _fs = new FileStream(_FileName, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, 1048576, FileFlagNoBuffering);
@@ -94,7 +87,7 @@ namespace BFS4WIN
         {
             return _bOpen;
         }
-
+        
         public Boolean ReadScoop(int scoop, long totalNonces, long startNonce, Scoop target, int limit)
         {
             _lPosition = scoop * (64 * totalNonces) + startNonce * 64;

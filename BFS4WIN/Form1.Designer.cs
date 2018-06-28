@@ -47,28 +47,27 @@
             this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader15 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader16 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader17 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader18 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
-            this.button8 = new System.Windows.Forms.Button();
+            this.btn_CreateEmptyPlotFile = new System.Windows.Forms.Button();
             this.button9 = new System.Windows.Forms.Button();
             this.button10 = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.tb_version = new System.Windows.Forms.TextBox();
+            this.tb_capa1 = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
-            this.textBox6 = new System.Windows.Forms.TextBox();
+            this.tb_capa2 = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.textBox8 = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.memLimit = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.memLimit)).BeginInit();
             this.SuspendLayout();
@@ -185,7 +184,6 @@
             this.columnHeader9,
             this.columnHeader15,
             this.columnHeader16,
-            this.columnHeader17,
             this.columnHeader10,
             this.columnHeader18});
             this.listView2.FullRowSelect = true;
@@ -216,11 +214,6 @@
             this.columnHeader16.Text = "#Nonces";
             this.columnHeader16.Width = 99;
             // 
-            // columnHeader17
-            // 
-            this.columnHeader17.Text = "Stagger";
-            this.columnHeader17.Width = 93;
-            // 
             // columnHeader10
             // 
             this.columnHeader10.Text = "StartSector";
@@ -249,6 +242,7 @@
             this.button5.TabIndex = 9;
             this.button5.Text = "Delete Last File";
             this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // button6
             // 
@@ -258,15 +252,17 @@
             this.button6.TabIndex = 10;
             this.button6.Text = "Download Selected File";
             this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
-            // button8
+            // btn_CreateEmptyPlotFile
             // 
-            this.button8.Location = new System.Drawing.Point(183, 437);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(165, 23);
-            this.button8.TabIndex = 12;
-            this.button8.Text = "Create Empty Plot";
-            this.button8.UseVisualStyleBackColor = true;
+            this.btn_CreateEmptyPlotFile.Location = new System.Drawing.Point(183, 437);
+            this.btn_CreateEmptyPlotFile.Name = "btn_CreateEmptyPlotFile";
+            this.btn_CreateEmptyPlotFile.Size = new System.Drawing.Size(165, 23);
+            this.btn_CreateEmptyPlotFile.TabIndex = 12;
+            this.btn_CreateEmptyPlotFile.Text = "Create Empty Plot";
+            this.btn_CreateEmptyPlotFile.UseVisualStyleBackColor = true;
+            this.btn_CreateEmptyPlotFile.Click += new System.EventHandler(this.btn_CreateEmptyPlotFile_Click);
             // 
             // button9
             // 
@@ -285,6 +281,7 @@
             this.button10.TabIndex = 14;
             this.button10.Text = "Merge File Into Selected File";
             this.button10.UseVisualStyleBackColor = true;
+            this.button10.Click += new System.EventHandler(this.button10_Click);
             // 
             // label3
             // 
@@ -295,19 +292,20 @@
             this.label3.TabIndex = 16;
             this.label3.Text = "BFS version";
             // 
-            // textBox2
+            // tb_version
             // 
-            this.textBox2.Location = new System.Drawing.Point(76, 239);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(78, 20);
-            this.textBox2.TabIndex = 17;
+            this.tb_version.Location = new System.Drawing.Point(76, 239);
+            this.tb_version.Name = "tb_version";
+            this.tb_version.Size = new System.Drawing.Size(78, 20);
+            this.tb_version.TabIndex = 17;
             // 
-            // textBox3
+            // tb_capa1
             // 
-            this.textBox3.Location = new System.Drawing.Point(309, 239);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(78, 20);
-            this.textBox3.TabIndex = 19;
+            this.tb_capa1.Location = new System.Drawing.Point(309, 239);
+            this.tb_capa1.Name = "tb_capa1";
+            this.tb_capa1.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.tb_capa1.Size = new System.Drawing.Size(78, 20);
+            this.tb_capa1.TabIndex = 19;
             // 
             // label4
             // 
@@ -350,12 +348,13 @@
             this.label6.TabIndex = 24;
             this.label6.Text = "Available (Nonces)";
             // 
-            // textBox6
+            // tb_capa2
             // 
-            this.textBox6.Location = new System.Drawing.Point(309, 263);
-            this.textBox6.Name = "textBox6";
-            this.textBox6.Size = new System.Drawing.Size(78, 20);
-            this.textBox6.TabIndex = 23;
+            this.tb_capa2.Location = new System.Drawing.Point(309, 263);
+            this.tb_capa2.Name = "tb_capa2";
+            this.tb_capa2.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.tb_capa2.Size = new System.Drawing.Size(78, 20);
+            this.tb_capa2.TabIndex = 23;
             // 
             // label7
             // 
@@ -382,10 +381,10 @@
             this.label9.TabIndex = 26;
             this.label9.Text = "Bad Sectors";
             // 
-            // openFileDialog1
+            // openFileDialog
             // 
-            this.openFileDialog1.FileName = "openFileDialog1";
-            this.openFileDialog1.Filter = "PoC2 plot files|*_*_*.*|PoC1 plot files|*_*_*_*.*";
+            this.openFileDialog.FileName = "openFileDialog1";
+            this.openFileDialog.Filter = "PoC2 plot files|*_*_*.*|PoC1 plot files|*_*_*_*.*";
             // 
             // memLimit
             // 
@@ -424,17 +423,17 @@
             this.Controls.Add(this.label9);
             this.Controls.Add(this.textBox5);
             this.Controls.Add(this.label6);
-            this.Controls.Add(this.textBox6);
+            this.Controls.Add(this.tb_capa2);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.textBox4);
             this.Controls.Add(this.label5);
-            this.Controls.Add(this.textBox3);
+            this.Controls.Add(this.tb_capa1);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.tb_version);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.button10);
             this.Controls.Add(this.button9);
-            this.Controls.Add(this.button8);
+            this.Controls.Add(this.btn_CreateEmptyPlotFile);
             this.Controls.Add(this.button6);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);
@@ -447,7 +446,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.listView1);
             this.Name = "Form1";
-            this.Text = "Johnny\'s BFSTool for Windows v.0.1";
+            this.Text = "Johnny\'s BFSTool v.0.1";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.memLimit)).EndInit();
             this.ResumeLayout(false);
@@ -479,25 +478,24 @@
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.ColumnHeader columnHeader15;
         private System.Windows.Forms.ColumnHeader columnHeader16;
-        private System.Windows.Forms.ColumnHeader columnHeader17;
         private System.Windows.Forms.ColumnHeader columnHeader18;
-        private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.Button btn_CreateEmptyPlotFile;
         private System.Windows.Forms.Button button9;
         private System.Windows.Forms.Button button10;
         private System.Windows.Forms.ColumnHeader columnHeader10;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox tb_version;
+        private System.Windows.Forms.TextBox tb_capa1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox textBox6;
+        private System.Windows.Forms.TextBox tb_capa2;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox textBox8;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.NumericUpDown memLimit;
     }
 }

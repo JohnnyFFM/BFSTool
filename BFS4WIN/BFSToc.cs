@@ -13,23 +13,47 @@ namespace BFS4WIN
     Size is 4k (Original) + 4k (Backup).
     First 4 byte: BFS1
     A table of 32 slots for plot files.
-    Each slot (36 byte) contains: key (64bit), startNonce (64bit), nonces(32bit), stagger(32bit), startPos(32bit), status(32bit), pos(32bit)
-    If stagger=0 -> POC2 file
+    Each slot (44 byte) contains: key (64bit), startNonce (64bit), nonces(64bit), startPos(64bit), pos(64bit), status(32bit)
     startPos: 4k sector number where the plot file starts
     status:
-        1=File is ready to use
-        2=File is incomplete (writing or plotting)
-        3=Converting to POC2
-    pos: Counter value used for plotting and converting.
-    After TOC table of defect areas (880 byte):
-    TotalDiskspaces (8 byte) - disk space in 4k sectors.
-    Each entry (8 byte) contains: startPos(32bit), size(32bit)
+      1 = OK -> File is ready to use
+      2 = WRITING -> File is incomplete. Current position is saved in parameter 'pos'.
+      3 = PLOTTING -> File is incomplete. Current nonce is saved in parameter 'pos'.
+      4 = CONVERTING -> File is incomplete. Current scoop is saved in parameter 'pos'.
+    pos: Counter value used for wrinting and plotting.
+
+    After TOC table of 52 defect areas (624 byte):
+    Each entry (12 byte) contains: startPos(64bit), size(32bit)
     startPos: 4k sector number where the defect area starts
     size: Size of defect area as 4k sector count
-    Last 8 byte of 4k TOC are:
-    CRC(32bit) -> Algo is CRC32
+
+    Last 12 byte of 4k TOC:
+    Size of disk in 4k sectors (64bit)
+    Last 4 byte of 4k TOC is CRC(32bit) -> Algo is CRC32
     */
     /// </summary>
+
+    //PoC PlotFile structure
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct PlotFile
+    {
+        public UInt64 id;
+        public UInt64 startNonce;
+        public UInt64 nonces;
+        public UInt64 startPos;
+        public UInt64 pos;
+        public UInt32 status;
+    }
+
+    //BadSector strcuture
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct BadSector
+    {
+        public UInt64 startPos;
+        public UInt32 size;
+    }
+
+    //BFSTOC
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct BFSTOC
     {
@@ -37,7 +61,7 @@ namespace BFS4WIN
         public byte[] version;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         public PlotFile[] plotFiles;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 110)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 52)]
         public BadSector[] badSectors;
         public UInt64 diskspace;
         public UInt32 crc32;
@@ -78,7 +102,7 @@ namespace BFS4WIN
             return count;
         }
 
-        public int AddPlotFile(ulong id, ulong start,uint nonces,uint stagger,uint status,uint pos)
+        public int AddPlotFile(UInt64 id, UInt64 start, UInt64 nonces, UInt32 status, UInt64 pos)
         {
             int position = PlotFileCount();
             //return false if no slot left
@@ -86,7 +110,7 @@ namespace BFS4WIN
             
             //return false if no disk space left
             ulong freespace;
-            uint newStartPos;
+            ulong newStartPos;
             if (pos == 0)
             {
                 freespace = diskspace;
@@ -97,13 +121,12 @@ namespace BFS4WIN
                 newStartPos = plotFiles[pos - 1].startPos + plotFiles[pos - 1].nonces / 64;
                 freespace = diskspace - newStartPos + 2;
             }
-            if (nonces / 64 > freespace) return -1;
+            if (nonces * 64 > freespace) return -1;
 
             //add file
             plotFiles[pos].id = id;
             plotFiles[pos].startNonce = start;
             plotFiles[pos].nonces = nonces;
-            plotFiles[pos].stagger = stagger;
             plotFiles[pos].status = status;
             plotFiles[pos].pos = pos;
             plotFiles[pos].startPos = newStartPos;
@@ -139,26 +162,4 @@ namespace BFS4WIN
         }
     }
 
-    //Plotfile data
-    //Each slot(36 bytes) contains: key(64bit), startNonce(64bit), nonces(32bit), stagger(32bit), startPos(32bit), status(32bit), pos(32bit)
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct PlotFile
-    {
-        public ulong id;
-        public ulong startNonce;
-        public uint nonces;
-        public uint stagger;
-        public uint startPos;
-        public uint status;
-        public uint pos;
-    }
-
-    //Plotfile data
-    //Each slot(8 bytes) contains: startPos(32bit),endPos(32bit)
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct BadSector
-    {
-        public uint startPos;
-        public uint endPos;
-    }
 }
