@@ -44,7 +44,7 @@ namespace BFS4WIN
                 item.SubItems.Add(llda.GetTotalSectors(i).ToString());
                 item.SubItems.Add(llda.GetCaption(i));
                 item.SubItems.Add(((decimal)llda.GetTotalSectors(i)* llda.BytesPerSector(i)/1024/1024/1024).ToString("0.00")+" GiB");
-                item.SubItems.Add(((long)(llda.GetTotalSectors(i)-1) * llda.BytesPerSector(i) / 4096 / 64).ToString());
+                item.SubItems.Add(((long)(llda.GetTotalSectors(i)-3) * llda.BytesPerSector(i) / 4096 / 64).ToString());
                 listView1.Items.Add(item);
                 i += 1;
             }
@@ -56,7 +56,7 @@ namespace BFS4WIN
         {
             if (listView1.SelectedItems.Count > 0)
             {
-                BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(listView1.SelectedItems[0].SubItems[1].Text, 0, 4096));
+                BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(listView1.SelectedItems[0].SubItems[1].Text, 1, 4096));
                 //Get BFS Infos
                 tb_version.Text = Encoding.ASCII.GetString(bfsTOC.version);
                 tb_capa1.Text = ((decimal)bfsTOC.diskspace * 4096 / 1024 / 1024 / 1024).ToString("0.00");
@@ -103,10 +103,19 @@ namespace BFS4WIN
                 UInt32 bytesPerSector = (UInt32.Parse(listView1.SelectedItems[0].SubItems[2].Text));
                 UInt64 totalSectors = (UInt64.Parse(listView1.SelectedItems[0].SubItems[3].Text));
 
-                //Todo check if drive has partition, deny formatting if so
-                byte[] data = BFSTOC.emptyToc(totalSectors,bytesPerSector).ToByteArray();
-                llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 0, 4096,data);
-                textBox1.Text = string.Join(" ", data.Select(x => x.ToString("X2")));
+                //TODO check if drive has partition, deny formatting if so
+                //TODO check if drive has a drive letter assigned
+                //TODO add GPT style for drives >2TB
+
+                //create classic MBR
+                MBR mbr = new MBR((UInt32)totalSectors, bytesPerSector);
+                //create BFSTOC
+                BFSTOC bfsTOC = BFSTOC.emptyToc(totalSectors, bytesPerSector);
+                //write
+                llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 0, 4096, mbr.ToByteArray());
+                llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 1, 4096, bfsTOC.ToByteArray());
+                textBox1.Text = string.Join(" ", mbr.ToByteArray().Select(x => x.ToString("X2")));
+                textBox1.Text += string.Join(" ", bfsTOC.ToByteArray().Select(x => x.ToString("X2")));
             }
         }
 
@@ -151,14 +160,14 @@ namespace BFS4WIN
             }
 
             //only support optimized files
-          //  if (temp.stagger > 0 && temp.stagger != temp.nonces) return;
+            //if (temp.stagger > 0 && temp.stagger != temp.nonces) return;
             //Read current bfsTOC
-            BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(listView1.SelectedItems[0].SubItems[1].Text, 0, 4096));
+            BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(listView1.SelectedItems[0].SubItems[1].Text, 1, 4096));
             //update bfsTOC
             int position = bfsTOC.AddPlotFile(temp.id, temp.startNonce, temp.nonces/64*64, 2, 0);
             if (position == -1) return;
             //save bfsTOC
-            llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 0, 4096, bfsTOC.ToByteArray());
+            llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 1, 4096, bfsTOC.ToByteArray());
             //transfer file
             //open source handle
             ScoopReadWriter reader; ;
@@ -260,12 +269,12 @@ namespace BFS4WIN
         private void btn_CreateEmptyPlotFile_Click(object sender, EventArgs e)
         {
             //Read current bfsTOC
-            BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(listView1.SelectedItems[0].SubItems[1].Text, 0, 4096));
+            BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(listView1.SelectedItems[0].SubItems[1].Text, 1, 4096));
             //update bfsTOC
-            int position = bfsTOC.AddPlotFile(1234, 0, 12467242 / 64 * 64, 2, 0);
+            int position = bfsTOC.AddPlotFile(1234, 0, 10000 / 64 * 64, 2, 0);
             if (position == -1) return;
             //save bfsTOC
-            llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 0, 4096, bfsTOC.ToByteArray());
+            llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 1, 4096, bfsTOC.ToByteArray());
 
         }
     }

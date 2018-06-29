@@ -53,7 +53,55 @@ namespace BFS4WIN
         public UInt32 size;
     }
 
-    //BFSTOC
+    //classic MBR
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct MBR
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4096)]
+        public byte[] mbr;
+
+        //Create classic MBR for BFS
+        public MBR(UInt32 totalSectors, UInt32 bytesPerSector) {
+            mbr = new byte[4096];
+            //Calculate Parition Size
+            UInt64 partitionSize = (2 + ((((UInt64)totalSectors * bytesPerSector / 4096) - 3) / 64) * 64)*(4096/bytesPerSector);
+            UInt32 partitionSizeX = (UInt32)partitionSize;
+            byte[] lbaSize = BitConverter.GetBytes(partitionSize);
+            //Partiton Start (CHS)
+            mbr[447] = 0x00;
+            mbr[448] = 0x09; //first sector is 1 not 0
+            mbr[449] = 0x00;
+            //Partition ID
+            mbr[450] = 0x64;
+            //Partiton End (CHS)
+            mbr[451] = 0xFE;
+            mbr[452] = 0xFF;
+            mbr[453] = 0xFF;
+            //Starting Sector (LBA)
+            mbr[454] = 0x08;
+            mbr[455] = 0x00;
+            mbr[456] = 0x00;
+            mbr[457] = 0x00;
+            //Partition Size (LBA)
+            mbr[458] = lbaSize[0];
+            mbr[459] = lbaSize[1];
+            mbr[460] = lbaSize[2];
+            mbr[461] = lbaSize[3];
+            //Magic Bytes
+            mbr[510] = 0x55;
+            mbr[511] = 0xAA;
+        }
+
+        public byte[] ToByteArray()
+        {
+            byte[] buff = new byte[TSSize.Size];
+            GCHandle handle = GCHandle.Alloc(buff, GCHandleType.Pinned);
+            Marshal.StructureToPtr(this, handle.AddrOfPinnedObject(), false);
+            handle.Free();
+            return buff;
+        }
+    }
+        //BFSTOC
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct BFSTOC
     {
@@ -76,14 +124,45 @@ namespace BFS4WIN
             return s;
         }
 
+
+
         public static BFSTOC emptyToc(UInt64 totalSectors, UInt32 bytesPerSector)
         {
             BFSTOC s = new BFSTOC
             {
                 version = Encoding.ASCII.GetBytes("BFS1"),
-                diskspace = (((totalSectors * bytesPerSector / 4096)-2)/64)*64
+                diskspace = (((totalSectors * bytesPerSector / 4096) - 3) / 64) * 64,
             };
-            s.UpdateCRC32();
+            s.plotFiles = new PlotFile[32];
+            s.plotFiles[0].startPos = 2;
+            
+            /*
+            //define GPT PMBR
+            //Partiton Start (CHS)
+            s.mbr[447] = 0x00;
+            s.mbr[448] = 0x02;
+            s.mbr[449] = 0x00;
+            //Partition ID
+            s.mbr[450] = 0xEE;
+            //Partiton End (CHS)
+            s.mbr[451] = 0xFE;
+            s.mbr[452] = 0xFF;
+            s.mbr[453] = 0xFF;
+            //Starting Sector (LBA)
+            s.mbr[454] = 0x01; //in CHS a partition can only start at the beginning of a track, 3F is second track. 
+            s.mbr[455] = 0x00;
+            s.mbr[456] = 0x00;
+            s.mbr[457] = 0x00;
+            //Partition Size (LBA)
+            s.mbr[458] = 0xFF;
+            s.mbr[459] = 0xFF;
+            s.mbr[460] = 0xFF;
+            s.mbr[461] = 0xFF;
+            //Magic Bytes
+            s.mbr[510] = 0x55;
+            s.mbr[511] = 0xAA;
+            */
+            //s.UpdateCRC32();
             return s;
         }
 
@@ -111,27 +190,27 @@ namespace BFS4WIN
             //return false if no disk space left
             ulong freespace;
             ulong newStartPos;
-            if (pos == 0)
+            if (position == 0)
             {
                 freespace = diskspace;
-                newStartPos = 2;
+                newStartPos = plotFiles[0].startPos;
             }
             else
             {
-                newStartPos = plotFiles[pos - 1].startPos + plotFiles[pos - 1].nonces / 64;
+                newStartPos = plotFiles[position - 1].startPos + plotFiles[position - 1].nonces * 64;
                 freespace = diskspace - newStartPos + 2;
             }
             if (nonces * 64 > freespace) return -1;
 
             //add file
-            plotFiles[pos].id = id;
-            plotFiles[pos].startNonce = start;
-            plotFiles[pos].nonces = nonces;
-            plotFiles[pos].status = status;
-            plotFiles[pos].pos = pos;
-            plotFiles[pos].startPos = newStartPos;
+            plotFiles[position].id = id;
+            plotFiles[position].startNonce = start;
+            plotFiles[position].nonces = nonces;
+            plotFiles[position].status = status;
+            plotFiles[position].pos = pos;
+            plotFiles[position].startPos = newStartPos;
             UpdateCRC32();
-            return (int)pos;
+            return (int)position;
         }
 
         public byte[] ToByteArray()
@@ -142,6 +221,23 @@ namespace BFS4WIN
             handle.Free();
             return buff;
         }
+
+
+        /*
+         * mS 	 Anzahl der Sektoren pro Zylinder 
+ mH 	 Anzahl der Köpfe 
+ S 	 Sektor 
+ H 	 Kopf 
+ C 	 Zylinder 
+LBA = (C*mH*mS) + (H*mS) + S - 
+
+    S=LBA+1-(((LBA+1-S-(H*ms))/mH*mS)*mH*mS) + (((LBA+1-S-(C*mH*mS))/ms)*mS)1
+
+
+         * 
+         * 
+         */
+
     }
 
     internal sealed class TSSize
