@@ -76,14 +76,27 @@ namespace BFS4WIN
         /// </summary>
         /// <param name="Data">ByteArray des Befehls</param>
         /// <returns>UInt32 CRC Checksumme</returns>
-        public static UInt32 CRC32(byte[] Data)
+        public static UInt32 CRC32BFSTOC(byte[] Data)
         {
             UInt32 crc = 0xffffffff;
             //4096 byte size, 2048bytes used, last 4 bytes of 2048 data will be the CRC32
-            for (int i = 0; i < Data.Length-4-2048; i++)
+            for (int i = 0; i < Data.Length-2048; i++)
                 crc = (crc >> 8) ^ crctab[(crc & 0xff) ^ Data[i]];
             crc ^= 0xffffffff;
             return crc;
         }
+
+        public static UInt32 CRC32(byte[] Data)
+        {
+            UInt32 crc = 0xffffffff;
+            //4096 byte size, 2048bytes used, last 4 bytes of 2048 data will be the CRC32
+            for (int i = 0; i < Data.Length; i++)
+                crc = (crc >> 8) ^ crctab[(crc & 0xff) ^ Data[i]];
+            crc ^= 0xffffffff;
+            return crc;
+        }
+
+
+
     }
 }

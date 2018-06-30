@@ -50,7 +50,7 @@
             this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader18 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
+            this.btn_deleteFile = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
             this.btn_CreateEmptyPlotFile = new System.Windows.Forms.Button();
             this.button9 = new System.Windows.Forms.Button();
@@ -69,6 +69,7 @@
             this.label9 = new System.Windows.Forms.Label();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.memLimit = new System.Windows.Forms.NumericUpDown();
+            this.button5 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.memLimit)).BeginInit();
             this.SuspendLayout();
             // 
@@ -234,15 +235,15 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
-            // button5
+            // btn_deleteFile
             // 
-            this.button5.Location = new System.Drawing.Point(354, 437);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(165, 23);
-            this.button5.TabIndex = 9;
-            this.button5.Text = "Delete Last File";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
+            this.btn_deleteFile.Location = new System.Drawing.Point(354, 437);
+            this.btn_deleteFile.Name = "btn_deleteFile";
+            this.btn_deleteFile.Size = new System.Drawing.Size(165, 23);
+            this.btn_deleteFile.TabIndex = 9;
+            this.btn_deleteFile.Text = "Delete Last File";
+            this.btn_deleteFile.UseVisualStyleBackColor = true;
+            this.btn_deleteFile.Click += new System.EventHandler(this.btn_deleteFile_Click);
             // 
             // button6
             // 
@@ -252,7 +253,6 @@
             this.button6.TabIndex = 10;
             this.button6.Text = "Download Selected File";
             this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // btn_CreateEmptyPlotFile
             // 
@@ -281,7 +281,6 @@
             this.button10.TabIndex = 14;
             this.button10.Text = "Merge File Into Selected File";
             this.button10.UseVisualStyleBackColor = true;
-            this.button10.Click += new System.EventHandler(this.button10_Click);
             // 
             // label3
             // 
@@ -413,11 +412,22 @@
             0,
             0});
             // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(525, 210);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(165, 23);
+            this.button5.TabIndex = 30;
+            this.button5.Text = "Read GPT";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 646);
+            this.Controls.Add(this.button5);
             this.Controls.Add(this.memLimit);
             this.Controls.Add(this.textBox8);
             this.Controls.Add(this.label9);
@@ -435,7 +445,7 @@
             this.Controls.Add(this.button9);
             this.Controls.Add(this.btn_CreateEmptyPlotFile);
             this.Controls.Add(this.button6);
-            this.Controls.Add(this.button5);
+            this.Controls.Add(this.btn_deleteFile);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.listView2);
@@ -474,7 +484,7 @@
         private System.Windows.Forms.ColumnHeader columnHeader8;
         private System.Windows.Forms.ColumnHeader columnHeader9;
         private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button btn_deleteFile;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.ColumnHeader columnHeader15;
         private System.Windows.Forms.ColumnHeader columnHeader16;
@@ -497,6 +507,7 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.NumericUpDown memLimit;
+        private System.Windows.Forms.Button button5;
     }
 }
 

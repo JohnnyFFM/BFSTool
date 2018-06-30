@@ -56,7 +56,7 @@ namespace BFS4WIN
         {
             if (listView1.SelectedItems.Count > 0)
             {
-                BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(listView1.SelectedItems[0].SubItems[1].Text, 1, 4096));
+                BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(listView1.SelectedItems[0].SubItems[1].Text, 5, 4096));
                 //Get BFS Infos
                 tb_version.Text = Encoding.ASCII.GetString(bfsTOC.version);
                 tb_capa1.Text = ((decimal)bfsTOC.diskspace * 4096 / 1024 / 1024 / 1024).ToString("0.00");
@@ -93,6 +93,7 @@ namespace BFS4WIN
                 }                        
              
             textBox1.Text = string.Join(" ", bfsTOC.ToByteArray().Select(x => x.ToString("X2")));
+
             }
         }
 
@@ -100,22 +101,60 @@ namespace BFS4WIN
         {
             if (listView1.SelectedItems.Count > 0)
             {
+                Boolean usegpt = false;
                 UInt32 bytesPerSector = (UInt32.Parse(listView1.SelectedItems[0].SubItems[2].Text));
                 UInt64 totalSectors = (UInt64.Parse(listView1.SelectedItems[0].SubItems[3].Text));
 
-                //TODO check if drive has partition, deny formatting if so
-                //TODO check if drive has a drive letter assigned
-                //TODO add GPT style for drives >2TB
+                //TODO check if drive is a virgin, deny formatting if not
 
-                //create classic MBR
-                MBR mbr = new MBR((UInt32)totalSectors, bytesPerSector);
-                //create BFSTOC
-                BFSTOC bfsTOC = BFSTOC.emptyToc(totalSectors, bytesPerSector);
-                //write
-                llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 0, 4096, mbr.ToByteArray());
-                llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 1, 4096, bfsTOC.ToByteArray());
-                textBox1.Text = string.Join(" ", mbr.ToByteArray().Select(x => x.ToString("X2")));
-                textBox1.Text += string.Join(" ", bfsTOC.ToByteArray().Select(x => x.ToString("X2")));
+
+                //TODO check GPT style for drives >2TB
+                usegpt = true;
+
+
+                if (usegpt)
+                {
+                    //create protective MBR
+                    //create GPT
+                    GPT gpt = new GPT(totalSectors, bytesPerSector);
+                    byte[] test = gpt.ToByteArray();
+
+                    //create BFSTOC
+                    BFSTOC bfsTOC = BFSTOC.emptyToc(totalSectors, bytesPerSector, false);
+                    //write GPT
+                    llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 0, 4096*5, gpt.ToByteArray());
+                    //write MirrorGPT
+                    llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, (Int64)totalSectors - 5, 4096 * 5, gpt.ToByteArray());
+                    //write  BFSTOC
+                    llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 5, 4096, bfsTOC.ToByteArray());
+                    //TODO write mirror BFSTOC                   
+                    //trigger OS partition table re-read
+                    llda.refreshDrive(listView1.SelectedItems[0].SubItems[1].Text);
+                    //Debug (to be removed)
+                    textBox1.Text = string.Join(" ", gpt.ToByteArray().Select(x => x.ToString("X2")));
+                    textBox1.Text += string.Join(" ", bfsTOC.ToByteArray().Select(x => x.ToString("X2")));
+               
+
+            }
+                else
+                {
+                    //create classic MBR
+                    MBR mbr = new MBR((UInt32)totalSectors, bytesPerSector,false);
+                    //inflate to 4k
+                    Array.Resize(ref mbr.mbr, 4096);
+                    //create BFSTOC
+                    BFSTOC bfsTOC = BFSTOC.emptyToc(totalSectors, bytesPerSector,false);
+                    //write MBR
+                    llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 0, 4096, mbr.ToByteArray());
+                    //write  BFSTOC
+                    llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 1, 4096, bfsTOC.ToByteArray());
+                    //TODO write mirror BFSTOC                   
+                    //trigger OS partition table re-read
+                    llda.refreshDrive(listView1.SelectedItems[0].SubItems[1].Text);
+                    //Debug (to be removed)
+                    textBox1.Text = string.Join(" ", mbr.ToByteArray().Select(x => x.ToString("X2")));
+                    textBox1.Text += string.Join(" ", bfsTOC.ToByteArray().Select(x => x.ToString("X2")));
+                }
             }
         }
 
@@ -251,20 +290,7 @@ namespace BFS4WIN
 
   
 
-        private void button6_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button5_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button10_Click(object sender, EventArgs e)
-        {
-
-        }
+  
 
         private void btn_CreateEmptyPlotFile_Click(object sender, EventArgs e)
         {
@@ -276,6 +302,26 @@ namespace BFS4WIN
             //save bfsTOC
             llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 1, 4096, bfsTOC.ToByteArray());
 
+        }
+
+        private void btn_deleteFile_Click(object sender, EventArgs e)
+        {
+            //Read current bfsTOC
+            BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(listView1.SelectedItems[0].SubItems[1].Text, 1, 4096));
+            //update bfsTOC if delete success
+            if (bfsTOC.DeleteLastPlotFile()) llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 1, 4096, bfsTOC.ToByteArray());
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                GPT gpt = GPT.FromSectors(llda.ReadSector(listView1.SelectedItems[0].SubItems[1].Text, 0, 4096*5));
+                gpt.gptHeader.UpdateCRC32(CRC.CRC32(gpt.gptPartitionTable.ToByteArray()));
+
+             
+
+            }
         }
     }
 }
