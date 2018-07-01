@@ -64,7 +64,7 @@ namespace BFS4WIN
             uint CREATE_NEW = 1;
             uint CREATE_ALWAYS = 2;
             uint OPEN_EXISTING = 3;
-
+            Boolean test;
             SafeFileHandle handleValue = CreateFile(drive, GENERIC_READ, 0, IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
             if (handleValue.IsInvalid)
             {
@@ -73,7 +73,9 @@ namespace BFS4WIN
             Int32 read = 0;
 
             int IOCTL_DISK_UPDATE_PROPERTIES = 0x70140;
-            return DeviceIoControl(handleValue, IOCTL_DISK_UPDATE_PROPERTIES, IntPtr.Zero, 0, IntPtr.Zero, 0, ref read, IntPtr.Zero);
+            test = DeviceIoControl(handleValue, IOCTL_DISK_UPDATE_PROPERTIES, IntPtr.Zero, 0, IntPtr.Zero, 0, ref read, IntPtr.Zero);
+            handleValue.Close();
+            return test;
         }
 
         // get proper amount of sectors
