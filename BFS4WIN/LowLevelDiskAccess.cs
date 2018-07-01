@@ -76,6 +76,43 @@ namespace BFS4WIN
             return DeviceIoControl(handleValue, IOCTL_DISK_UPDATE_PROPERTIES, IntPtr.Zero, 0, IntPtr.Zero, 0, ref read, IntPtr.Zero);
         }
 
+        // get proper amount of sectors
+        public Int64 GetSectors(string drive)
+        {
+            short FILE_ATTRIBUTE_NORMAL = 0x80;
+            short INVALID_HANDLE_VALUE = -1;
+            uint GENERIC_READ = 0x80000000;
+            uint GENERIC_WRITE = 0x40000000;
+            uint CREATE_NEW = 1;
+            uint CREATE_ALWAYS = 2;
+            uint OPEN_EXISTING = 3;
+
+            SafeFileHandle handleValue = CreateFile(drive, GENERIC_READ, 0, IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
+            if (handleValue.IsInvalid)
+            {
+                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+            }
+   
+            Int64 DriveSize = 0;
+
+
+            IntPtr outDriveSize = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(Int64)));
+
+            Int32 read = 0;
+
+            int IOCTL_DISK_GET_LENGTH_INFO = 0x7405c;
+            if (DeviceIoControl(handleValue, IOCTL_DISK_GET_LENGTH_INFO, IntPtr.Zero, 0, outDriveSize, Marshal.SizeOf(typeof(Int64)), ref read, IntPtr.Zero))
+                {
+                handleValue.Close();
+                DriveSize = (Int64)Marshal.PtrToStructure(outDriveSize, typeof(Int64));
+                Marshal.FreeHGlobal(outDriveSize);
+                return DriveSize;
+            }
+            else {
+                handleValue.Close();
+                return 0;
+            }
+        }
         /// <summary> 
         /// Returns the Sector from the drive at the specified location 
         /// </summary> 

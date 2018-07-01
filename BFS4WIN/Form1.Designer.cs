@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.listView1 = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -36,19 +37,20 @@
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label1 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btn_queryDrives = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
+            this.btn_format = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.listView2 = new System.Windows.Forms.ListView();
-            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader15 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader16 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader18 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader11 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader12 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader13 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader14 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.button4 = new System.Windows.Forms.Button();
             this.btn_deleteFile = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
@@ -69,7 +71,6 @@
             this.label9 = new System.Windows.Forms.Label();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.memLimit = new System.Windows.Forms.NumericUpDown();
-            this.button5 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.memLimit)).BeginInit();
             this.SuspendLayout();
             // 
@@ -82,12 +83,13 @@
             this.columnHeader4,
             this.columnHeader5,
             this.columnHeader6,
-            this.columnHeader7});
+            this.columnHeader7,
+            this.columnHeader8});
             this.listView1.FullRowSelect = true;
             this.listView1.HideSelection = false;
-            this.listView1.Location = new System.Drawing.Point(12, 35);
+            this.listView1.Location = new System.Drawing.Point(12, 25);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(776, 169);
+            this.listView1.Size = new System.Drawing.Size(796, 179);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -95,58 +97,68 @@
             // columnHeader1
             // 
             this.columnHeader1.Text = "ID";
+            this.columnHeader1.Width = 26;
             // 
             // columnHeader2
             // 
             this.columnHeader2.Text = "Drive";
+            this.columnHeader2.Width = 121;
             // 
             // columnHeader3
             // 
-            this.columnHeader3.Text = "BytesPerSector";
+            this.columnHeader3.Text = "Total Sectors";
+            this.columnHeader3.Width = 78;
             // 
             // columnHeader4
             // 
-            this.columnHeader4.Text = "TotalSectors";
-            this.columnHeader4.Width = 137;
+            this.columnHeader4.Text = "Sector Size";
+            this.columnHeader4.Width = 77;
             // 
             // columnHeader5
             // 
             this.columnHeader5.Text = "Caption";
-            this.columnHeader5.Width = 237;
+            this.columnHeader5.Width = 229;
             // 
             // columnHeader6
             // 
-            this.columnHeader6.Text = "Size";
+            this.columnHeader6.Text = "Capacity [GiB]";
+            this.columnHeader6.Width = 82;
             // 
             // columnHeader7
             // 
-            this.columnHeader7.Text = "Capacity [nonces]";
+            this.columnHeader7.Text = "Capacity [Nonces]";
+            this.columnHeader7.Width = 120;
+            // 
+            // columnHeader8
+            // 
+            this.columnHeader8.Text = "BFS";
+            this.columnHeader8.Width = 59;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 19);
+            this.label1.Location = new System.Drawing.Point(11, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(37, 13);
             this.label1.TabIndex = 1;
             this.label1.Text = "Drives";
             // 
-            // button1
+            // btn_queryDrives
             // 
-            this.button1.Location = new System.Drawing.Point(12, 210);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(165, 23);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "Query Drives";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.btn_queryDrives.Location = new System.Drawing.Point(12, 210);
+            this.btn_queryDrives.Name = "btn_queryDrives";
+            this.btn_queryDrives.Size = new System.Drawing.Size(165, 23);
+            this.btn_queryDrives.TabIndex = 2;
+            this.btn_queryDrives.Text = "Query Drives";
+            this.btn_queryDrives.UseVisualStyleBackColor = true;
+            this.btn_queryDrives.Click += new System.EventHandler(this.btn_QueryDrives_Click);
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(12, 522);
+            this.textBox1.Location = new System.Drawing.Point(12, 586);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(776, 97);
+            this.textBox1.Size = new System.Drawing.Size(796, 48);
             this.textBox1.TabIndex = 3;
             // 
             // button2
@@ -159,15 +171,15 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // button3
+            // btn_format
             // 
-            this.button3.Location = new System.Drawing.Point(183, 210);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(165, 23);
-            this.button3.TabIndex = 5;
-            this.button3.Text = "Format Drive to BFS";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.btn_format.Location = new System.Drawing.Point(183, 210);
+            this.btn_format.Name = "btn_format";
+            this.btn_format.Size = new System.Drawing.Size(165, 23);
+            this.btn_format.TabIndex = 5;
+            this.btn_format.Text = "Format Drive to BFS";
+            this.btn_format.UseVisualStyleBackColor = true;
+            this.btn_format.Click += new System.EventHandler(this.button3_Click);
             // 
             // label2
             // 
@@ -181,53 +193,53 @@
             // listView2
             // 
             this.listView2.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader8,
             this.columnHeader9,
-            this.columnHeader15,
-            this.columnHeader16,
             this.columnHeader10,
-            this.columnHeader18});
+            this.columnHeader11,
+            this.columnHeader12,
+            this.columnHeader13,
+            this.columnHeader14});
             this.listView2.FullRowSelect = true;
             this.listView2.HideSelection = false;
-            this.listView2.Location = new System.Drawing.Point(12, 303);
+            this.listView2.Location = new System.Drawing.Point(12, 306);
             this.listView2.Name = "listView2";
-            this.listView2.Size = new System.Drawing.Size(776, 128);
+            this.listView2.Size = new System.Drawing.Size(796, 163);
             this.listView2.TabIndex = 6;
             this.listView2.UseCompatibleStateImageBehavior = false;
             this.listView2.View = System.Windows.Forms.View.Details;
             // 
-            // columnHeader8
-            // 
-            this.columnHeader8.Text = "ID";
-            // 
             // columnHeader9
             // 
-            this.columnHeader9.Text = "Numeric ID";
-            this.columnHeader9.Width = 88;
-            // 
-            // columnHeader15
-            // 
-            this.columnHeader15.Text = "StartNonce";
-            this.columnHeader15.Width = 94;
-            // 
-            // columnHeader16
-            // 
-            this.columnHeader16.Text = "#Nonces";
-            this.columnHeader16.Width = 99;
+            this.columnHeader9.Text = "ID";
             // 
             // columnHeader10
             // 
-            this.columnHeader10.Text = "StartSector";
-            this.columnHeader10.Width = 96;
+            this.columnHeader10.Text = "Numeric ID";
+            this.columnHeader10.Width = 88;
             // 
-            // columnHeader18
+            // columnHeader11
             // 
-            this.columnHeader18.Text = "Status";
-            this.columnHeader18.Width = 222;
+            this.columnHeader11.Text = "StartNonce";
+            this.columnHeader11.Width = 94;
+            // 
+            // columnHeader12
+            // 
+            this.columnHeader12.Text = "#Nonces";
+            this.columnHeader12.Width = 99;
+            // 
+            // columnHeader13
+            // 
+            this.columnHeader13.Text = "StartSector";
+            this.columnHeader13.Width = 96;
+            // 
+            // columnHeader14
+            // 
+            this.columnHeader14.Text = "Status";
+            this.columnHeader14.Width = 222;
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(12, 437);
+            this.button4.Location = new System.Drawing.Point(12, 475);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(165, 23);
             this.button4.TabIndex = 8;
@@ -237,7 +249,7 @@
             // 
             // btn_deleteFile
             // 
-            this.btn_deleteFile.Location = new System.Drawing.Point(354, 437);
+            this.btn_deleteFile.Location = new System.Drawing.Point(354, 475);
             this.btn_deleteFile.Name = "btn_deleteFile";
             this.btn_deleteFile.Size = new System.Drawing.Size(165, 23);
             this.btn_deleteFile.TabIndex = 9;
@@ -247,7 +259,7 @@
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(12, 466);
+            this.button6.Location = new System.Drawing.Point(12, 504);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(165, 23);
             this.button6.TabIndex = 10;
@@ -256,7 +268,7 @@
             // 
             // btn_CreateEmptyPlotFile
             // 
-            this.btn_CreateEmptyPlotFile.Location = new System.Drawing.Point(183, 437);
+            this.btn_CreateEmptyPlotFile.Location = new System.Drawing.Point(183, 475);
             this.btn_CreateEmptyPlotFile.Name = "btn_CreateEmptyPlotFile";
             this.btn_CreateEmptyPlotFile.Size = new System.Drawing.Size(165, 23);
             this.btn_CreateEmptyPlotFile.TabIndex = 12;
@@ -266,7 +278,7 @@
             // 
             // button9
             // 
-            this.button9.Location = new System.Drawing.Point(183, 466);
+            this.button9.Location = new System.Drawing.Point(183, 504);
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(165, 23);
             this.button9.TabIndex = 13;
@@ -275,7 +287,7 @@
             // 
             // button10
             // 
-            this.button10.Location = new System.Drawing.Point(354, 466);
+            this.button10.Location = new System.Drawing.Point(354, 504);
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(165, 23);
             this.button10.TabIndex = 14;
@@ -366,7 +378,7 @@
             // 
             // textBox8
             // 
-            this.textBox8.Location = new System.Drawing.Point(686, 239);
+            this.textBox8.Location = new System.Drawing.Point(76, 263);
             this.textBox8.Name = "textBox8";
             this.textBox8.Size = new System.Drawing.Size(78, 20);
             this.textBox8.TabIndex = 27;
@@ -374,7 +386,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(585, 242);
+            this.label9.Location = new System.Drawing.Point(12, 266);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(65, 13);
             this.label9.TabIndex = 26;
@@ -392,7 +404,7 @@
             0,
             0,
             0});
-            this.memLimit.Location = new System.Drawing.Point(726, 440);
+            this.memLimit.Location = new System.Drawing.Point(726, 475);
             this.memLimit.Maximum = new decimal(new int[] {
             4096,
             0,
@@ -412,22 +424,11 @@
             0,
             0});
             // 
-            // button5
-            // 
-            this.button5.Location = new System.Drawing.Point(525, 210);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(165, 23);
-            this.button5.TabIndex = 30;
-            this.button5.Text = "Read GPT";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 646);
-            this.Controls.Add(this.button5);
+            this.ClientSize = new System.Drawing.Size(820, 646);
             this.Controls.Add(this.memLimit);
             this.Controls.Add(this.textBox8);
             this.Controls.Add(this.label9);
@@ -449,13 +450,18 @@
             this.Controls.Add(this.button4);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.listView2);
-            this.Controls.Add(this.button3);
+            this.Controls.Add(this.btn_format);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btn_queryDrives);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.listView1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(836, 685);
+            this.MinimumSize = new System.Drawing.Size(836, 685);
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Johnny\'s BFSTool v.0.1";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.memLimit)).EndInit();
@@ -468,31 +474,31 @@
 
         private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btn_queryDrives;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ColumnHeader columnHeader6;
         private System.Windows.Forms.ColumnHeader columnHeader7;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button btn_format;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ListView listView2;
-        private System.Windows.Forms.ColumnHeader columnHeader8;
         private System.Windows.Forms.ColumnHeader columnHeader9;
+        private System.Windows.Forms.ColumnHeader columnHeader10;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button btn_deleteFile;
         private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.ColumnHeader columnHeader15;
-        private System.Windows.Forms.ColumnHeader columnHeader16;
-        private System.Windows.Forms.ColumnHeader columnHeader18;
+        private System.Windows.Forms.ColumnHeader columnHeader11;
+        private System.Windows.Forms.ColumnHeader columnHeader12;
+        private System.Windows.Forms.ColumnHeader columnHeader14;
         private System.Windows.Forms.Button btn_CreateEmptyPlotFile;
         private System.Windows.Forms.Button button9;
         private System.Windows.Forms.Button button10;
-        private System.Windows.Forms.ColumnHeader columnHeader10;
+        private System.Windows.Forms.ColumnHeader columnHeader13;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox tb_version;
         private System.Windows.Forms.TextBox tb_capa1;
@@ -507,7 +513,7 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.NumericUpDown memLimit;
-        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.ColumnHeader columnHeader8;
     }
 }
 

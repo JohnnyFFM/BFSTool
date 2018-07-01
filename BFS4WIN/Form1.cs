@@ -24,10 +24,10 @@ namespace BFS4WIN
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            btn_QueryDrives_Click(null,null);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btn_QueryDrives_Click(object sender, EventArgs e)
         {
             listView1.Items.Clear();
             ArrayList result;
@@ -39,17 +39,18 @@ namespace BFS4WIN
                 item.Text = i.ToString();
                 item.Name = i.ToString();
                 item.SubItems.Add(x);
+                //item.SubItems.Add(llda.GetTotalSectors(i).ToString());
+                Int64 sectors = llda.GetSectors(x)/512;
+                item.SubItems.Add(sectors.ToString());
                 item.SubItems.Add(llda.BytesPerSector(i).ToString());
-
-                item.SubItems.Add(llda.GetTotalSectors(i).ToString());
                 item.SubItems.Add(llda.GetCaption(i));
-                item.SubItems.Add(((decimal)llda.GetTotalSectors(i)* llda.BytesPerSector(i)/1024/1024/1024).ToString("0.00")+" GiB");
-                item.SubItems.Add(((long)(llda.GetTotalSectors(i)-3) * llda.BytesPerSector(i) / 4096 / 64).ToString());
+                item.SubItems.Add(((decimal)sectors * llda.BytesPerSector(i) / 1024/1024/1024).ToString("0.00")+" GiB");
+                item.SubItems.Add(((long)(sectors-3) * llda.BytesPerSector(i) / 4096 / 64).ToString());
                 listView1.Items.Add(item);
                 i += 1;
             }
-            listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+            //listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+           // listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -102,8 +103,8 @@ namespace BFS4WIN
             if (listView1.SelectedItems.Count > 0)
             {
                 Boolean usegpt = false;
-                UInt32 bytesPerSector = (UInt32.Parse(listView1.SelectedItems[0].SubItems[2].Text));
-                UInt64 totalSectors = (UInt64.Parse(listView1.SelectedItems[0].SubItems[3].Text));
+                UInt32 bytesPerSector = (UInt32.Parse(listView1.SelectedItems[0].SubItems[3].Text));
+                UInt64 totalSectors = (UInt64.Parse(listView1.SelectedItems[0].SubItems[2].Text));
 
                 //TODO check if drive is a virgin, deny formatting if not
 
@@ -120,7 +121,7 @@ namespace BFS4WIN
                     byte[] test = gpt.ToByteArray();
 
                     //create BFSTOC
-                    BFSTOC bfsTOC = BFSTOC.emptyToc(totalSectors, bytesPerSector, false);
+                    BFSTOC bfsTOC = BFSTOC.emptyToc(totalSectors, bytesPerSector, true);
                     //write GPT
                     llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 0, 4096*5, gpt.ToByteArray());
                     //write MirrorGPT
@@ -295,12 +296,12 @@ namespace BFS4WIN
         private void btn_CreateEmptyPlotFile_Click(object sender, EventArgs e)
         {
             //Read current bfsTOC
-            BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(listView1.SelectedItems[0].SubItems[1].Text, 1, 4096));
+            BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(listView1.SelectedItems[0].SubItems[1].Text, 5, 4096));
             //update bfsTOC
             int position = bfsTOC.AddPlotFile(1234, 0, 10000 / 64 * 64, 2, 0);
             if (position == -1) return;
             //save bfsTOC
-            llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 1, 4096, bfsTOC.ToByteArray());
+            llda.WriteSector(listView1.SelectedItems[0].SubItems[1].Text, 5, 4096, bfsTOC.ToByteArray());
 
         }
 

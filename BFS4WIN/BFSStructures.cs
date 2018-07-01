@@ -5,34 +5,7 @@ using System.Text;
 
 namespace BFS4WIN
 {
-    /// <summary>
-    /// Summary description for BFSTOC.
-    /// implements BFS1 designed by brmmmm
-    //definition used:
-    /*Contents TOC (BFS1):
-    Size is 4k (Original) + 4k (Backup).
-    First 4 byte: BFS1
-    A table of 32 slots for plot files.
-    Each slot (44 byte) contains: key (64bit), startNonce (64bit), nonces(64bit), startPos(64bit), pos(64bit), status(32bit)
-    startPos: 4k sector number where the plot file starts
-    status:
-      1 = OK -> File is ready to use
-      2 = WRITING -> File is incomplete. Current position is saved in parameter 'pos'.
-      3 = PLOTTING -> File is incomplete. Current nonce is saved in parameter 'pos'.
-      4 = CONVERTING -> File is incomplete. Current scoop is saved in parameter 'pos'.
-    pos: Counter value used for wrinting and plotting.
 
-    After TOC table of 52 defect areas (624 byte):
-    Each entry (12 byte) contains: startPos(64bit), size(32bit)
-    startPos: 4k sector number where the defect area starts
-    size: Size of defect area as 4k sector count
-
-    Last 12 byte of 4k TOC:
-    Size of disk in 4k sectors (64bit)
-    Last 4 byte of 4k TOC is CRC(32bit) -> Algo is CRC32
-    */
-    /// </summary>
-    //PoC PlotFile structure
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct PlotFile
     {
@@ -271,7 +244,34 @@ namespace BFS4WIN
             return buff;
         }
     }
-        //BFSTOC
+    //BFSTOC
+    /// <summary>
+    /// Summary description for BFSTOC.
+    /// implements BFS1 designed by brmmmm
+    /*Contents of 4k TOC (BFS1):
+    Size of TOC is 2k (Data) + 2k (Reserved).
+    First 4 byte: BFS1
+    A table of 32 slots for plot files.
+    Each slot (44 byte) contains: key (64bit), startNonce (64bit), nonces(64bit), startPos(64bit), pos(64bit), status(32bit)
+    startPos: 4k sector number where the plot file starts
+    status:
+      1 = OK -> File is ready to use
+      2 = WRITING -> File is incomplete. Current position is saved in parameter 'pos'.
+      3 = PLOTTING -> File is incomplete. Current nonce is saved in parameter 'pos'.
+      4 = CONVERTING -> File is incomplete. Current scoop is saved in parameter 'pos'.
+    pos: Counter value used for wrinting and plotting.
+
+    After TOC table of 52 defect areas (624 byte):
+    Each entry (12 byte) contains: startPos(64bit), size(32bit)
+    startPos: 4k sector number where the defect area starts
+    size: Size of defect area as 4k sector count
+
+    Last 12 bytes of 2k TOC:
+    Size of disk in 4k sectors (64bit)
+    Last 4 bytes of 2k TOC are CRC(32bit) -> Algo is CRC32
+    */
+    /// </summary>
+    //PoC PlotFile structure
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct BFSTOC
     {
@@ -380,51 +380,16 @@ namespace BFS4WIN
             return true;
         }
 
-
-
         public byte[] ToByteArray()
         {
-            byte[] buff = new byte[TSSize.Size];
+            byte[] buff = new byte[Marshal.SizeOf(typeof(BFSTOC))];
             GCHandle handle = GCHandle.Alloc(buff, GCHandleType.Pinned);
             Marshal.StructureToPtr(this, handle.AddrOfPinnedObject(), false);
             handle.Free();
             return buff;
         }
-
-
-        /*
-         * mS 	 Anzahl der Sektoren pro Zylinder 
- mH 	 Anzahl der Köpfe 
- S 	 Sektor 
- H 	 Kopf 
- C 	 Zylinder 
-LBA = (C*mH*mS) + (H*mS) + S - 
-
-    S=LBA+1-(((LBA+1-S-(H*ms))/mH*mS)*mH*mS) + (((LBA+1-S-(C*mH*mS))/ms)*mS)1
-
-
-         * 
-         * 
-         */
-
     }
 
-    internal sealed class TSSize
-    {
-        public static int _size;
 
-        static TSSize()
-        {
-            _size = Marshal.SizeOf(typeof(BFSTOC));
-        }
-
-        public static int Size
-        {
-            get
-            {
-                return _size;
-            }
-        }
-    }
 
 }
