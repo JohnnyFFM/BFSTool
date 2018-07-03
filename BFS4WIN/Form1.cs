@@ -6,18 +6,20 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
-// low level disk access taken from https://code.msdn.microsoft.com/windowsapps/CCS-LABS-C-Low-Level-Disk-91676ca9 
 
 namespace BFS4WIN
 {
     public partial class Form1 : Form
     {
         LowLevelDiskAccess llda;
+        static AutoResetEvent[] autoEvents;
         UInt64 startOffset;
         UInt64 scoopOffset;
+        static Boolean halt1 = false;
+        static Boolean halt2 = false;
 
         public Form1()
         {
@@ -189,7 +191,12 @@ namespace BFS4WIN
             Scoop scoop2 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop
             Scoop scoop3 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop
             Scoop scoop4 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop      
-            
+
+            //initialise stats
+            DateTime start = DateTime.Now;
+            TimeSpan elapsed;
+            TimeSpan togo;
+
             //create masterplan     
             int loops = (int)Math.Ceiling((double)(temp.nonces) / limit);
             TaskInfo[] masterplan = new TaskInfo[2048 * loops];
@@ -306,6 +313,32 @@ namespace BFS4WIN
             if (ti.x != (ti.end - 1))
             {
                 autoEvents[1].Set();
+            }
+        }
+
+        //Pretty Print Timespan
+        private static string TimeSpanToString(TimeSpan timeSpan)
+        {
+            if (timeSpan.ToString().LastIndexOf(".") > -1)
+            {
+                return timeSpan.ToString().Substring(0, timeSpan.ToString().LastIndexOf("."));
+            }
+            else
+            {
+                return timeSpan.ToString();
+            }
+        }
+
+
+        //Convert Poc1>Poc2 and vice versa
+        private static void Poc1poc2shuffle(Scoop scoop1, Scoop scoop2, int limit)
+        {
+            byte[] buffer = new byte[32];
+            for (int i = 0; i < limit; i++)
+            {
+                Buffer.BlockCopy(scoop1.byteArrayField, 64 * i + 32, buffer, 0, 32);
+                Buffer.BlockCopy(scoop2.byteArrayField, 64 * i + 32, scoop1.byteArrayField, 64 * i + 32, 32);
+                Buffer.BlockCopy(buffer, 0, scoop2.byteArrayField, 64 * i + 32, 32);
             }
         }
 
