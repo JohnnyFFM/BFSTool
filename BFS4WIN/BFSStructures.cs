@@ -7,24 +7,23 @@ namespace BFS4WIN
 {
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct BFSPlotFile
+    {
+        public UInt64 startNonce;
+        public UInt32 nonces;
+        public UInt64 startPos;
+        public UInt32 status;
+        public UInt32 pos;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct PlotFile
     {
         public UInt64 id;
         public UInt64 startNonce;
-        public UInt64 nonces;
-        public UInt64 startPos;
-        public UInt64 pos;
-        public UInt32 status;
+        public UInt32 nonces;
+        public UInt32 stagger;
     }
-
-    //BadSector structure
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct BadSector
-    {
-        public UInt64 startPos;
-        public UInt32 size;
-    }
-
 
     //GPT
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -37,6 +36,7 @@ namespace BFS4WIN
         public GPTPartitionTable gptPartitionTable;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3072)]
         public byte[] reserved2;
+
         //Create GPT for BFS
         public GPT(UInt64 totalSectors, UInt32 bytesPerSector)
         {
@@ -118,7 +118,6 @@ namespace BFS4WIN
             handle.Free();
             return buff;
         }
-
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -187,7 +186,6 @@ namespace BFS4WIN
             handle.Free();
             return buff;
         }
-
     }
 
     //MBR
@@ -302,14 +300,14 @@ namespace BFS4WIN
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public byte[] version;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-        public PlotFile[] plotFiles;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 52)]
-        public BadSector[] badSectors;
-        public UInt64 diskspace;
         public UInt32 crc32;
+        public UInt64 diskspace;
+        public UInt64 id;
+        public UInt64 reserved1;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 72)]
+        public BFSPlotFile[] plotFiles;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2048)]
-        public byte[] reserved;
+        public byte[] reserved2;
 
         public static BFSTOC FromSector(byte[] buff)
         {
@@ -326,7 +324,7 @@ namespace BFS4WIN
                 version = Encoding.ASCII.GetBytes("BFS1"),
                 diskspace = (((totalSectors * bytesPerSector / 4096) - 3) / 64) * 64,
             };
-            s.plotFiles = new PlotFile[32];
+            s.plotFiles = new BFSPlotFile[72];
             if(gpt)
             {
                 s.plotFiles[0].startPos = 6;
@@ -348,14 +346,14 @@ namespace BFS4WIN
         public int PlotFileCount()
         {
             int count = 0;
-            foreach (PlotFile plotFile in plotFiles)
+            foreach (BFSPlotFile plotFile in plotFiles)
             {
-                if (plotFile.id != 0) count++;
+                if (plotFile.status != 0) count++;
             }
             return count;
         }
 
-        public int AddPlotFile(UInt64 id, UInt64 start, UInt64 nonces, UInt32 status, UInt64 pos)
+        public int AddPlotFile(UInt64 start, UInt32 nonces, UInt32 status, UInt32 pos)
         {
             int position = PlotFileCount();
             //return false if no slot left
@@ -377,7 +375,6 @@ namespace BFS4WIN
             if (nonces * 64 > freespace) return -1;
 
             //add file
-            plotFiles[position].id = id;
             plotFiles[position].startNonce = start;
             plotFiles[position].nonces = nonces;
             plotFiles[position].status = status;
@@ -393,14 +390,13 @@ namespace BFS4WIN
             //return false if no file left
             if (position == 0) return false;
             position -= 1;
-            //for the first file, don_t killstartpos
             //add file
-            plotFiles[position].id = 0;
             plotFiles[position].startNonce = 0;
             plotFiles[position].nonces = 0;
+            //for the first file, don_t killstartpos
+            if (position != 0) plotFiles[position].startPos = 0;
             plotFiles[position].status = 0;
             plotFiles[position].pos = 0;
-            if (position != 0) plotFiles[position].startPos = 0;
             UpdateCRC32();
             return true;
         }

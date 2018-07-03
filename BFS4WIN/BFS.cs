@@ -22,6 +22,18 @@ namespace BFS4WIN
             bfsTOC = BFSTOC.FromSector(llda.ReadSector(drive, 5, 4096));
         }
 
+
+        public static void saveBFSTOC(string drive)
+        {
+            //update CRC before save
+            bfsTOC.UpdateCRC32();
+            //write  BFSTOC
+            llda.WriteSector(drive, 5, 4096, bfsTOC.ToByteArray());
+            //write mirror BFSTOC
+            llda.WriteSector(drive, 6 + (Int64)bfsTOC.diskspace, 4096, bfsTOC.ToByteArray());
+        }
+
+
         public static Boolean isBFS(string drive)
         {
             Boolean test = true;
@@ -33,6 +45,15 @@ namespace BFS4WIN
             byte[] version = Encoding.ASCII.GetBytes("BFS1");
             test = test && bfsTOC.version.SequenceEqual(version);
             return test;
+        }
+
+        public static int AddPlotFile(String drive, UInt64 start, UInt32 nonces, UInt32 status, UInt32 pos)
+        {
+            int result;
+            loadBFSTOC(drive);
+            result = bfsTOC.AddPlotFile(start, nonces, status, pos);
+            saveBFSTOC(drive);
+            return result;
         }
 
         public static void FormatDriveGPT(string drive, UInt64 totalSectors, UInt32 bytesPerSector)

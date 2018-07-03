@@ -48,7 +48,6 @@
             this.columnHeader11 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader12 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader13 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader14 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.button4 = new System.Windows.Forms.Button();
             this.btn_deleteFile = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
@@ -72,6 +71,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.label8 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.memLimit)).BeginInit();
             this.SuspendLayout();
             // 
@@ -182,8 +182,7 @@
             this.columnHeader10,
             this.columnHeader11,
             this.columnHeader12,
-            this.columnHeader13,
-            this.columnHeader14});
+            this.columnHeader13});
             this.bfsView.FullRowSelect = true;
             this.bfsView.HideSelection = false;
             this.bfsView.Location = new System.Drawing.Point(12, 261);
@@ -199,28 +198,23 @@
             // 
             // columnHeader10
             // 
-            this.columnHeader10.Text = "Numeric ID";
-            this.columnHeader10.Width = 88;
+            this.columnHeader10.Text = "StartNonce";
+            this.columnHeader10.Width = 94;
             // 
             // columnHeader11
             // 
-            this.columnHeader11.Text = "StartNonce";
-            this.columnHeader11.Width = 94;
+            this.columnHeader11.Text = "#Nonces";
+            this.columnHeader11.Width = 99;
             // 
             // columnHeader12
             // 
-            this.columnHeader12.Text = "#Nonces";
-            this.columnHeader12.Width = 99;
+            this.columnHeader12.Text = "StartSector";
+            this.columnHeader12.Width = 96;
             // 
             // columnHeader13
             // 
-            this.columnHeader13.Text = "StartSector";
-            this.columnHeader13.Width = 96;
-            // 
-            // columnHeader14
-            // 
-            this.columnHeader14.Text = "Status";
-            this.columnHeader14.Width = 222;
+            this.columnHeader13.Text = "Status";
+            this.columnHeader13.Width = 222;
             // 
             // button4
             // 
@@ -392,7 +386,7 @@
             0,
             0,
             0});
-            this.memLimit.Location = new System.Drawing.Point(715, 487);
+            this.memLimit.Location = new System.Drawing.Point(713, 513);
             this.memLimit.Maximum = new decimal(new int[] {
             4096,
             0,
@@ -423,7 +417,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(671, 489);
+            this.label8.Location = new System.Drawing.Point(669, 515);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(38, 13);
             this.label8.TabIndex = 31;
@@ -432,17 +426,28 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(783, 489);
+            this.label10.Location = new System.Drawing.Point(781, 515);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(23, 13);
             this.label10.TabIndex = 32;
             this.label10.Text = "MB";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(354, 210);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(165, 23);
+            this.button1.TabIndex = 33;
+            this.button1.Text = "Set Numeric ID";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click_1);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(820, 565);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.statusStrip1);
@@ -499,17 +504,16 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ListView bfsView;
         private System.Windows.Forms.ColumnHeader columnHeader9;
-        private System.Windows.Forms.ColumnHeader columnHeader10;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button btn_deleteFile;
         private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.ColumnHeader columnHeader10;
         private System.Windows.Forms.ColumnHeader columnHeader11;
-        private System.Windows.Forms.ColumnHeader columnHeader12;
-        private System.Windows.Forms.ColumnHeader columnHeader14;
+        private System.Windows.Forms.ColumnHeader columnHeader13;
         private System.Windows.Forms.Button btn_CreateEmptyPlotFile;
         private System.Windows.Forms.Button button9;
         private System.Windows.Forms.Button button10;
-        private System.Windows.Forms.ColumnHeader columnHeader13;
+        private System.Windows.Forms.ColumnHeader columnHeader12;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox tb_version;
         private System.Windows.Forms.TextBox tb_capa1;
@@ -528,6 +532,7 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Button button1;
     }
 }
 

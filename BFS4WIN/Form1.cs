@@ -29,6 +29,7 @@ namespace BFS4WIN
 
         private void btn_QueryDrives_Click(object sender, EventArgs e)
         {
+
             drivesView.Items.Clear();
             ArrayList result;
             result = llda.GetDriveList();
@@ -39,7 +40,6 @@ namespace BFS4WIN
                 item.Text = i.ToString();
                 item.Name = i.ToString();
                 item.SubItems.Add(x);
-                //item.SubItems.Add(llda.GetTotalSectors(i).ToString());
                 Int64 sectors = llda.GetSectors(x)/512;
                 item.SubItems.Add(sectors.ToString());
                 item.SubItems.Add(llda.BytesPerSector(i).ToString());
@@ -58,16 +58,16 @@ namespace BFS4WIN
                 drivesView.Items.Add(item);
                 i += 1;
             }
-            //listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-           // listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+            ClearBFSView();
         }
+
 
 
         private void btn_format_Click(object sender, EventArgs e)
         {
             if (drivesView.SelectedItems.Count > 0)
             {
-                //Warning
+                //Issue Warning
                 DialogResult result = MessageBox.Show("WARNING: Formatting will erase ALL data on this disk." + "\n" + "To format the disk, press OK. To quit, click CANCEL.", "Format Local Disk ( "+ drivesView.SelectedItems[0].SubItems[1].Text + ")", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) return;
 
@@ -78,10 +78,9 @@ namespace BFS4WIN
                 //Format Drive using GPT, MBR would only make sense for small drives and small drives dont make sense for Burst
                 BFS.FormatDriveGPT(drive, totalSectors, bytesPerSector);
                 //Success
-                MessageBox.Show("Format Complete.                   ", "Formatting " + drivesView.SelectedItems[0].SubItems[1].Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Format Complete.\t\t\t", "Formatting " + drivesView.SelectedItems[0].SubItems[1].Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 //Refresh drives
                 btn_QueryDrives_Click(null, null);
-
             }
         }
 
@@ -130,7 +129,7 @@ namespace BFS4WIN
             //Read current bfsTOC
             BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(drivesView.SelectedItems[0].SubItems[1].Text, 1, 4096));
             //update bfsTOC
-            int position = bfsTOC.AddPlotFile(temp.id, temp.startNonce, temp.nonces/64*64, 2, 0);
+            int position = bfsTOC.AddPlotFile(temp.startNonce, temp.nonces/64*64, 2, 0);
             if (position == -1) return;
             //save bfsTOC
             llda.WriteSector(drivesView.SelectedItems[0].SubItems[1].Text, 1, 4096, bfsTOC.ToByteArray());
@@ -159,7 +158,7 @@ namespace BFS4WIN
                     masterplan[y * loops + zz].x = y * loops + zz;
                     masterplan[y * loops + zz].limit = limit;
                     masterplan[y * loops + zz].src = temp;
-                    masterplan[y * loops + zz].tar = bfsTOC.plotFiles[position];
+                  //  masterplan[y * loops + zz].tar = bfsTOC.plotFiles[position];
                     //masterplan[y * loops + zz].scoop1 = scoop1;
                    // masterplan[y * loops + zz].scoop2 = scoop2;
                    // masterplan[y * loops + zz].scoop3 = scoop3;
@@ -183,7 +182,7 @@ namespace BFS4WIN
             llda.WriteSector(drivesView.SelectedItems[0].SubItems[1].Text, 0, 4096, bfsTOC.ToByteArray());
         }
 
-        private void button8_Click(object sender, EventArgs e)
+        private void buttfgon8_Click(object sender, EventArgs e)
         {
             //Read current bfsTOC
             BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(drivesView.SelectedItems[0].SubItems[1].Text, 0, 4096));
@@ -192,7 +191,7 @@ namespace BFS4WIN
             //if not fail, check if mirror is identical
             //if not copy over
             //count current files
-            bfsTOC.AddPlotFile(13014439754249942082, 1857887936, 0, 2, 0);
+          //  bfsTOC.AddPlotFile(13014439754249942082, 1857887936, 0, 2, 0);
             llda.WriteSector(drivesView.SelectedItems[0].SubItems[1].Text, 0, 4096, bfsTOC.ToByteArray());
         }
 
@@ -220,15 +219,14 @@ namespace BFS4WIN
 
         private void btn_CreateEmptyPlotFile_Click(object sender, EventArgs e)
         {
-            //Read current bfsTOC
-            BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(drivesView.SelectedItems[0].SubItems[1].Text, 5, 4096));
-            //update bfsTOC
-            int position = bfsTOC.AddPlotFile(1234, 0, 10000 / 64 * 64, 2, 0);
-            if (position == -1) return;
-            //save bfsTOC
-            llda.WriteSector(drivesView.SelectedItems[0].SubItems[1].Text, 5, 4096, bfsTOC.ToByteArray());
-            FillBFSView(drivesView.SelectedItems[0].SubItems[1].Text);
-
+            String drive = drivesView.SelectedItems[0].SubItems[1].Text;
+            if (BFS.AddPlotFile(drive, 0, 10000 / 64 * 64, 2, 0) > -1)
+            {
+                FillBFSView(drivesView.SelectedItems[0].SubItems[1].Text);
+            }
+            else {
+                MessageBox.Show("File Creation failed.\t\t\t", "Create file on" + drivesView.SelectedItems[0].SubItems[1].Text, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
         }
 
         private void btn_deleteFile_Click(object sender, EventArgs e)
@@ -266,7 +264,7 @@ namespace BFS4WIN
             }
         }
 
-
+        //Read BFS Filesystem and fill controls
         private void FillBFSView(string drive)
         {
             if (drivesView.SelectedItems.Count > 0)
@@ -277,20 +275,20 @@ namespace BFS4WIN
                 tb_capa1.Text = ((decimal)BFS.bfsTOC.diskspace * 4096 / 1024 / 1024 / 1024).ToString("0.00");
                 tb_capa2.Text = ((decimal)BFS.bfsTOC.diskspace / 64).ToString("0");
 
+                //Clear Files
                 bfsView.Items.Clear();
                 int i = 0;
-                foreach (PlotFile x in BFS.bfsTOC.plotFiles)
+                foreach (BFSPlotFile x in BFS.bfsTOC.plotFiles)
                 {
                     ListViewItem item = new ListViewItem();
                     item.Text = i.ToString();
                     item.Name = i.ToString();
-                    if (x.id == 0)
+                    if (x.status == 0)
                     {
                         item.SubItems.Add("Empty Slot");
                     }
                     else
                     {
-                        item.SubItems.Add(x.id.ToString());
                         item.SubItems.Add(x.startNonce.ToString());
                         item.SubItems.Add(x.nonces.ToString());
                         item.SubItems.Add(x.startPos.ToString());
@@ -342,6 +340,53 @@ namespace BFS4WIN
 
             }
 
+        }
+
+        private static DialogResult ShowInputDialog(ref string input)
+        {
+            System.Drawing.Size size = new System.Drawing.Size(200, 70);
+            Form inputBox = new Form();
+
+            inputBox.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            inputBox.ClientSize = size;
+            inputBox.ControlBox = false;
+            inputBox.StartPosition = FormStartPosition.CenterScreen;
+            inputBox.Text = "Name";
+
+            System.Windows.Forms.TextBox textBox = new TextBox();
+            textBox.Size = new System.Drawing.Size(size.Width - 10, 23);
+            textBox.Location = new System.Drawing.Point(5, 5);
+            textBox.Text = input;
+            inputBox.Controls.Add(textBox);
+
+            Button okButton = new Button();
+            okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+            okButton.Name = "okButton";
+            okButton.Size = new System.Drawing.Size(75, 23);
+            okButton.Text = "&OK";
+            okButton.Location = new System.Drawing.Point(size.Width - 80 - 80, 39);
+            inputBox.Controls.Add(okButton);
+
+            Button cancelButton = new Button();
+            cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            cancelButton.Name = "cancelButton";
+            cancelButton.Size = new System.Drawing.Size(75, 23);
+            cancelButton.Text = "&Cancel";
+            cancelButton.Location = new System.Drawing.Point(size.Width - 80, 39);
+            inputBox.Controls.Add(cancelButton);
+
+            inputBox.AcceptButton = okButton;
+            inputBox.CancelButton = cancelButton;
+
+            DialogResult result = inputBox.ShowDialog();
+            input = textBox.Text;
+            return result;
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            string test = "Please enter numeric ID";
+            ShowInputDialog(ref test);
         }
     }
 }
