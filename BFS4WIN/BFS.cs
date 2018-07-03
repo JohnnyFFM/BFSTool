@@ -17,16 +17,14 @@ namespace BFS4WIN
             llda = new LowLevelDiskAccess();
         }
 
-        public static void loadBFSTOC(string drive)
+        public static void LoadBFSTOC(string drive)
         {
             bfsTOC = BFSTOC.FromSector(llda.ReadSector(drive, 5, 4096));
         }
 
 
-        public static void saveBFSTOC(string drive)
+        public static void SaveBFSTOC(string drive)
         {
-            //update CRC before save
-            bfsTOC.UpdateCRC32();
             //write  BFSTOC
             llda.WriteSector(drive, 5, 4096, bfsTOC.ToByteArray());
             //write mirror BFSTOC
@@ -34,7 +32,7 @@ namespace BFS4WIN
         }
 
 
-        public static Boolean isBFS(string drive)
+        public static Boolean IsBFS(string drive)
         {
             Boolean test = true;
             //Check if first Partition is BFS
@@ -50,9 +48,28 @@ namespace BFS4WIN
         public static int AddPlotFile(String drive, UInt64 start, UInt32 nonces, UInt32 status, UInt32 pos)
         {
             int result;
-            loadBFSTOC(drive);
+            LoadBFSTOC(drive);
             result = bfsTOC.AddPlotFile(start, nonces, status, pos);
-            saveBFSTOC(drive);
+            SaveBFSTOC(drive);
+            return result;
+        }
+
+        public static Boolean SetID(String drive, UInt64 id)
+        {
+            LoadBFSTOC(drive);
+            bfsTOC.id = id ;
+            SaveBFSTOC(drive);
+            return true;
+        }
+
+        public static Boolean DeleteLastPlotFile(string drive)
+        {
+            Boolean result;
+            //Read current bfsTOC
+            LoadBFSTOC(drive);
+            //update bfsTOC if delete success
+            result = bfsTOC.DeleteLastPlotFile();
+            if (result) SaveBFSTOC(drive);
             return result;
         }
 

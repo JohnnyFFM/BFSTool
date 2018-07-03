@@ -51,7 +51,7 @@ namespace BFS4WIN
             gptPartitionTable.partitions[0].BFSParitionType = new Guid("53525542-4354-494F-4E46-494C45535953");
             gptPartitionTable.partitions[0].partitionGuid = Guid.NewGuid();
             gptPartitionTable.partitions[0].startPos = 40;
-            gptPartitionTable.partitions[0].endPos = (5+2 + ((((UInt64)totalSectors * bytesPerSector / 4096) - 12) / 64) * 64) * (4096 / bytesPerSector);
+            gptPartitionTable.partitions[0].endPos = (5+2 + ((((UInt64)totalSectors * bytesPerSector / 4096) - 12) / 64 / 64) * 64 *64) * (4096 / bytesPerSector);
             gptPartitionTable.partitions[0].attributes = 0;
             //gptEntries[0].partitionName = //Optional Name :-)
             //Update CRCs
@@ -322,7 +322,7 @@ namespace BFS4WIN
             BFSTOC s = new BFSTOC
             {
                 version = Encoding.ASCII.GetBytes("BFS1"),
-                diskspace = (((totalSectors * bytesPerSector / 4096) - 3) / 64) * 64,
+                diskspace = (((totalSectors * bytesPerSector / 4096) - 3) / 64 /64) * 64 *64,
             };
             s.plotFiles = new BFSPlotFile[72];
             if(gpt)
@@ -370,7 +370,7 @@ namespace BFS4WIN
             else
             {
                 newStartPos = plotFiles[position - 1].startPos + plotFiles[position - 1].nonces * 64;
-                freespace = diskspace - newStartPos + 2;
+                freespace = diskspace - newStartPos + 6;
             }
             if (nonces * 64 > freespace) return -1;
 

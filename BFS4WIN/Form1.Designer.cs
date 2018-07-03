@@ -48,30 +48,25 @@
             this.columnHeader11 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader12 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader13 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.button4 = new System.Windows.Forms.Button();
+            this.btn_upload = new System.Windows.Forms.Button();
             this.btn_deleteFile = new System.Windows.Forms.Button();
-            this.button6 = new System.Windows.Forms.Button();
-            this.btn_CreateEmptyPlotFile = new System.Windows.Forms.Button();
-            this.button9 = new System.Windows.Forms.Button();
-            this.button10 = new System.Windows.Forms.Button();
+            this.btn_download = new System.Windows.Forms.Button();
+            this.btn_createEmptyPlotFile = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.tb_version = new System.Windows.Forms.TextBox();
-            this.tb_capa1 = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.textBox4 = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.textBox5 = new System.Windows.Forms.TextBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.tb_capa2 = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.textBox8 = new System.Windows.Forms.TextBox();
+            this.lbl_capa = new System.Windows.Forms.Label();
+            this.tb_id = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.memLimit = new System.Windows.Forms.NumericUpDown();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.label8 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btn_setID = new System.Windows.Forms.Button();
+            this.capacity = new System.Windows.Forms.ProgressBar();
+            this.btn_plot = new System.Windows.Forms.Button();
+            this.btn_optimize = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.memLimit)).BeginInit();
             this.SuspendLayout();
             // 
@@ -216,70 +211,50 @@
             this.columnHeader13.Text = "Status";
             this.columnHeader13.Width = 222;
             // 
-            // button4
+            // btn_upload
             // 
-            this.button4.Location = new System.Drawing.Point(12, 484);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(165, 23);
-            this.button4.TabIndex = 8;
-            this.button4.Text = "Upload File";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.btn_upload.Location = new System.Drawing.Point(242, 479);
+            this.btn_upload.Name = "btn_upload";
+            this.btn_upload.Size = new System.Drawing.Size(109, 23);
+            this.btn_upload.TabIndex = 8;
+            this.btn_upload.Text = "Upload File";
+            this.btn_upload.UseVisualStyleBackColor = true;
+            this.btn_upload.Click += new System.EventHandler(this.button4_Click);
             // 
             // btn_deleteFile
             // 
-            this.btn_deleteFile.Location = new System.Drawing.Point(354, 484);
+            this.btn_deleteFile.Location = new System.Drawing.Point(127, 479);
             this.btn_deleteFile.Name = "btn_deleteFile";
-            this.btn_deleteFile.Size = new System.Drawing.Size(165, 23);
+            this.btn_deleteFile.Size = new System.Drawing.Size(109, 23);
             this.btn_deleteFile.TabIndex = 9;
             this.btn_deleteFile.Text = "Delete Last File";
             this.btn_deleteFile.UseVisualStyleBackColor = true;
             this.btn_deleteFile.Click += new System.EventHandler(this.btn_deleteFile_Click);
             // 
-            // button6
+            // btn_download
             // 
-            this.button6.Enabled = false;
-            this.button6.Location = new System.Drawing.Point(12, 513);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(165, 23);
-            this.button6.TabIndex = 10;
-            this.button6.Text = "Download Selected File";
-            this.button6.UseVisualStyleBackColor = true;
+            this.btn_download.Enabled = false;
+            this.btn_download.Location = new System.Drawing.Point(357, 479);
+            this.btn_download.Name = "btn_download";
+            this.btn_download.Size = new System.Drawing.Size(109, 23);
+            this.btn_download.TabIndex = 10;
+            this.btn_download.Text = "Download File";
+            this.btn_download.UseVisualStyleBackColor = true;
             // 
-            // btn_CreateEmptyPlotFile
+            // btn_createEmptyPlotFile
             // 
-            this.btn_CreateEmptyPlotFile.Location = new System.Drawing.Point(183, 484);
-            this.btn_CreateEmptyPlotFile.Name = "btn_CreateEmptyPlotFile";
-            this.btn_CreateEmptyPlotFile.Size = new System.Drawing.Size(165, 23);
-            this.btn_CreateEmptyPlotFile.TabIndex = 12;
-            this.btn_CreateEmptyPlotFile.Text = "Create Empty Plot";
-            this.btn_CreateEmptyPlotFile.UseVisualStyleBackColor = true;
-            this.btn_CreateEmptyPlotFile.Click += new System.EventHandler(this.btn_CreateEmptyPlotFile_Click);
-            // 
-            // button9
-            // 
-            this.button9.Enabled = false;
-            this.button9.Location = new System.Drawing.Point(183, 513);
-            this.button9.Name = "button9";
-            this.button9.Size = new System.Drawing.Size(165, 23);
-            this.button9.TabIndex = 13;
-            this.button9.Text = "Plot Selected File";
-            this.button9.UseVisualStyleBackColor = true;
-            // 
-            // button10
-            // 
-            this.button10.Enabled = false;
-            this.button10.Location = new System.Drawing.Point(354, 513);
-            this.button10.Name = "button10";
-            this.button10.Size = new System.Drawing.Size(165, 23);
-            this.button10.TabIndex = 14;
-            this.button10.Text = "Merge File Into Selected File";
-            this.button10.UseVisualStyleBackColor = true;
+            this.btn_createEmptyPlotFile.Location = new System.Drawing.Point(12, 479);
+            this.btn_createEmptyPlotFile.Name = "btn_createEmptyPlotFile";
+            this.btn_createEmptyPlotFile.Size = new System.Drawing.Size(109, 23);
+            this.btn_createEmptyPlotFile.TabIndex = 12;
+            this.btn_createEmptyPlotFile.Text = "Create New Plotfile";
+            this.btn_createEmptyPlotFile.UseVisualStyleBackColor = true;
+            this.btn_createEmptyPlotFile.Click += new System.EventHandler(this.btn_CreateEmptyPlotFile_Click);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(9, 433);
+            this.label3.Location = new System.Drawing.Point(14, 440);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(64, 13);
             this.label3.TabIndex = 16;
@@ -287,92 +262,46 @@
             // 
             // tb_version
             // 
-            this.tb_version.Location = new System.Drawing.Point(77, 430);
+            this.tb_version.Location = new System.Drawing.Point(82, 437);
             this.tb_version.Name = "tb_version";
-            this.tb_version.Size = new System.Drawing.Size(78, 20);
+            this.tb_version.ReadOnly = true;
+            this.tb_version.Size = new System.Drawing.Size(64, 20);
             this.tb_version.TabIndex = 17;
-            // 
-            // tb_capa1
-            // 
-            this.tb_capa1.Location = new System.Drawing.Point(312, 430);
-            this.tb_capa1.Name = "tb_capa1";
-            this.tb_capa1.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.tb_capa1.Size = new System.Drawing.Size(78, 20);
-            this.tb_capa1.TabIndex = 19;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(165, 433);
+            this.label4.Location = new System.Drawing.Point(418, 440);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(124, 13);
+            this.label4.Size = new System.Drawing.Size(48, 13);
             this.label4.TabIndex = 18;
-            this.label4.Text = "Formatted Capacity (GiB)";
+            this.label4.Text = "Capacity";
             // 
-            // textBox4
+            // lbl_capa
             // 
-            this.textBox4.Location = new System.Drawing.Point(504, 430);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(78, 20);
-            this.textBox4.TabIndex = 21;
+            this.lbl_capa.AutoSize = true;
+            this.lbl_capa.Location = new System.Drawing.Point(667, 441);
+            this.lbl_capa.Name = "lbl_capa";
+            this.lbl_capa.Size = new System.Drawing.Size(110, 13);
+            this.lbl_capa.TabIndex = 22;
+            this.lbl_capa.Text = "1.41 GiB free of 8 GiB";
             // 
-            // label5
+            // tb_id
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(403, 433);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(76, 13);
-            this.label5.TabIndex = 20;
-            this.label5.Text = "Available (GiB)";
-            // 
-            // textBox5
-            // 
-            this.textBox5.Location = new System.Drawing.Point(504, 454);
-            this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(78, 20);
-            this.textBox5.TabIndex = 25;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(403, 457);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(96, 13);
-            this.label6.TabIndex = 24;
-            this.label6.Text = "Available (Nonces)";
-            // 
-            // tb_capa2
-            // 
-            this.tb_capa2.Location = new System.Drawing.Point(312, 454);
-            this.tb_capa2.Name = "tb_capa2";
-            this.tb_capa2.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.tb_capa2.Size = new System.Drawing.Size(78, 20);
-            this.tb_capa2.TabIndex = 23;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(165, 457);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(144, 13);
-            this.label7.TabIndex = 22;
-            this.label7.Text = "Formatted Capacity (Nonces)";
-            // 
-            // textBox8
-            // 
-            this.textBox8.Location = new System.Drawing.Point(77, 454);
-            this.textBox8.Name = "textBox8";
-            this.textBox8.Size = new System.Drawing.Size(78, 20);
-            this.textBox8.TabIndex = 27;
+            this.tb_id.Location = new System.Drawing.Point(226, 437);
+            this.tb_id.Name = "tb_id";
+            this.tb_id.ReadOnly = true;
+            this.tb_id.Size = new System.Drawing.Size(186, 20);
+            this.tb_id.TabIndex = 27;
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(12, 457);
+            this.label9.Location = new System.Drawing.Point(152, 440);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(65, 13);
+            this.label9.Size = new System.Drawing.Size(68, 13);
             this.label9.TabIndex = 26;
-            this.label9.Text = "Bad Sectors";
+            this.label9.Text = "Numerical ID";
             // 
             // openFileDialog
             // 
@@ -386,7 +315,7 @@
             0,
             0,
             0});
-            this.memLimit.Location = new System.Drawing.Point(713, 513);
+            this.memLimit.Location = new System.Drawing.Point(715, 482);
             this.memLimit.Maximum = new decimal(new int[] {
             4096,
             0,
@@ -408,16 +337,17 @@
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 543);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 518);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(820, 22);
+            this.statusStrip1.SizingGrip = false;
             this.statusStrip1.TabIndex = 30;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(669, 515);
+            this.label8.Location = new System.Drawing.Point(671, 484);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(38, 13);
             this.label8.TabIndex = 31;
@@ -426,50 +356,72 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(781, 515);
+            this.label10.Location = new System.Drawing.Point(783, 484);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(23, 13);
             this.label10.TabIndex = 32;
             this.label10.Text = "MB";
             // 
-            // button1
+            // btn_setID
             // 
-            this.button1.Location = new System.Drawing.Point(354, 210);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(165, 23);
-            this.button1.TabIndex = 33;
-            this.button1.Text = "Set Numeric ID";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            this.btn_setID.Location = new System.Drawing.Point(354, 210);
+            this.btn_setID.Name = "btn_setID";
+            this.btn_setID.Size = new System.Drawing.Size(165, 23);
+            this.btn_setID.TabIndex = 33;
+            this.btn_setID.Text = "Set Numeric ID";
+            this.btn_setID.UseVisualStyleBackColor = true;
+            this.btn_setID.Click += new System.EventHandler(this.button1_Click_1);
+            // 
+            // capacity
+            // 
+            this.capacity.Location = new System.Drawing.Point(472, 439);
+            this.capacity.Name = "capacity";
+            this.capacity.Size = new System.Drawing.Size(189, 16);
+            this.capacity.TabIndex = 34;
+            // 
+            // btn_plot
+            // 
+            this.btn_plot.Enabled = false;
+            this.btn_plot.Location = new System.Drawing.Point(525, 210);
+            this.btn_plot.Name = "btn_plot";
+            this.btn_plot.Size = new System.Drawing.Size(165, 23);
+            this.btn_plot.TabIndex = 13;
+            this.btn_plot.Text = "Plot Disk";
+            this.btn_plot.UseVisualStyleBackColor = true;
+            // 
+            // btn_optimize
+            // 
+            this.btn_optimize.Enabled = false;
+            this.btn_optimize.Location = new System.Drawing.Point(472, 479);
+            this.btn_optimize.Name = "btn_optimize";
+            this.btn_optimize.Size = new System.Drawing.Size(109, 23);
+            this.btn_optimize.TabIndex = 37;
+            this.btn_optimize.Text = "Optimize TOC";
+            this.btn_optimize.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(820, 565);
-            this.Controls.Add(this.button1);
+            this.ClientSize = new System.Drawing.Size(820, 540);
+            this.Controls.Add(this.btn_optimize);
+            this.Controls.Add(this.capacity);
+            this.Controls.Add(this.btn_setID);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.memLimit);
-            this.Controls.Add(this.textBox8);
+            this.Controls.Add(this.tb_id);
             this.Controls.Add(this.label9);
-            this.Controls.Add(this.textBox5);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.tb_capa2);
-            this.Controls.Add(this.label7);
-            this.Controls.Add(this.textBox4);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.tb_capa1);
+            this.Controls.Add(this.lbl_capa);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.tb_version);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.button10);
-            this.Controls.Add(this.button9);
-            this.Controls.Add(this.btn_CreateEmptyPlotFile);
-            this.Controls.Add(this.button6);
+            this.Controls.Add(this.btn_plot);
+            this.Controls.Add(this.btn_createEmptyPlotFile);
+            this.Controls.Add(this.btn_download);
             this.Controls.Add(this.btn_deleteFile);
-            this.Controls.Add(this.button4);
+            this.Controls.Add(this.btn_upload);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.bfsView);
             this.Controls.Add(this.btn_format);
@@ -504,27 +456,19 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ListView bfsView;
         private System.Windows.Forms.ColumnHeader columnHeader9;
-        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button btn_upload;
         private System.Windows.Forms.Button btn_deleteFile;
-        private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.Button btn_download;
         private System.Windows.Forms.ColumnHeader columnHeader10;
         private System.Windows.Forms.ColumnHeader columnHeader11;
         private System.Windows.Forms.ColumnHeader columnHeader13;
-        private System.Windows.Forms.Button btn_CreateEmptyPlotFile;
-        private System.Windows.Forms.Button button9;
-        private System.Windows.Forms.Button button10;
+        private System.Windows.Forms.Button btn_createEmptyPlotFile;
         private System.Windows.Forms.ColumnHeader columnHeader12;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox tb_version;
-        private System.Windows.Forms.TextBox tb_capa1;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox4;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox textBox5;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox tb_capa2;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.TextBox textBox8;
+        private System.Windows.Forms.Label lbl_capa;
+        private System.Windows.Forms.TextBox tb_id;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.NumericUpDown memLimit;
@@ -532,7 +476,10 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btn_setID;
+        private System.Windows.Forms.ProgressBar capacity;
+        private System.Windows.Forms.Button btn_plot;
+        private System.Windows.Forms.Button btn_optimize;
     }
 }
 
