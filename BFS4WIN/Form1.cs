@@ -16,6 +16,9 @@ namespace BFS4WIN
     public partial class Form1 : Form
     {
         LowLevelDiskAccess llda;
+        UInt64 startOffset;
+        UInt64 scoopOffset;
+
         public Form1()
         {
             InitializeComponent();
@@ -120,13 +123,13 @@ namespace BFS4WIN
         struct TaskInfo
         {
             public ScoopReadWriter reader;
-            public string target;
+            public ScoopReadWriter writer;
             public int y;
             public int z;
             public int x;
             public int limit;
             public PlotFile src;
-            public PlotFile tar;
+            public BFSPlotFile tar;
             public Scoop scoop1;
             public Scoop scoop2;
             public Scoop scoop3;
@@ -167,35 +170,45 @@ namespace BFS4WIN
             int file = BFS.AddPlotFile(drive, temp.startNonce,temp.nonces/64*64,2,0);
 
             //Get offsets
-            UInt64 startOffset = BFS.bfsTOC.plotFiles[file].startPos;
-            UInt64 scoopOffset = BFS.bfsTOC.diskspace / 4096;
+            startOffset = BFS.bfsTOC.plotFiles[file].startPos;
+            scoopOffset = BFS.bfsTOC.diskspace / 4096;
 
             //transfer file
             //open source handle
-            ScoopReadWriter reader; ;
+            ScoopReadWriter reader; 
             reader = new ScoopReadWriter(openFileDialog.FileName);
             reader.OpenR(true);
 
-            int limit = Convert.ToInt32(memLimit.Value) * 4096;
+            ScoopReadWriter writer; 
+            writer = new ScoopReadWriter(drive);
+            reader.OpenW();
 
+            //Allocate memory
+            int limit = Convert.ToInt32(memLimit.Value) * 4096;
+            Scoop scoop1 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop
+            Scoop scoop2 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop
+            Scoop scoop3 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop
+            Scoop scoop4 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop      
+            
             //create masterplan     
             int loops = (int)Math.Ceiling((double)(temp.nonces) / limit);
             TaskInfo[] masterplan = new TaskInfo[2048 * loops];
+
             for (int y = 0; y < 2048; y++)
             {
                 int zz = 0;
                 //loop partial scoop               
-                for (int z = 0; (ulong)z < temp.nonces; z += limit)
+                for (int z = 0; (ulong)z < temp.nonces/64*64; z += limit)
                 {
                     masterplan[y * loops + zz] = new TaskInfo();
                     masterplan[y * loops + zz].reader = reader;
-                    masterplan[y * loops + zz].target = drivesView.SelectedItems[0].SubItems[1].Text;
+                    masterplan[y * loops + zz].writer = writer;
                     masterplan[y * loops + zz].y = y;
                     masterplan[y * loops + zz].z = z;
                     masterplan[y * loops + zz].x = y * loops + zz;
                     masterplan[y * loops + zz].limit = limit;
                     masterplan[y * loops + zz].src = temp;
-                    masterplan[y * loops + zz].tar = bfsTOC.plotFiles[position];
+                    masterplan[y * loops + zz].tar = BFS.bfsTOC.plotFiles[file];
                     masterplan[y * loops + zz].scoop1 = scoop1;
                     masterplan[y * loops + zz].scoop2 = scoop2;
                     masterplan[y * loops + zz].scoop3 = scoop3;
@@ -209,13 +222,92 @@ namespace BFS4WIN
 
             //execute taskplan
 
-            //mark progress resume
+            //perform first read
+            Th_read(masterplan[0]);
 
+            autoEvents = new AutoResetEvent[]
+            {
+                new AutoResetEvent(false),
+                new AutoResetEvent(false)
+            };
+
+            //perform reads and writes parallel
+            for (long x = 1; x < masterplan.LongLength; x++)
+            {
+                ThreadPool.QueueUserWorkItem(new WaitCallback(Th_write), masterplan[x - 1]);
+                ThreadPool.QueueUserWorkItem(new WaitCallback(Th_read), masterplan[x]);
+                WaitHandle.WaitAll(autoEvents);
+                if (halt1 || halt2)
+                {
+                    Console.Error.WriteLine("ERR: Shutting down!");
+                    return;
+                }
+
+                //update status
+                elapsed = DateTime.Now.Subtract(start);
+                togo = TimeSpan.FromTicks(elapsed.Ticks / (masterplan[x].y + 1) * (2048 - masterplan[x].y - 1));
+                string completed = Math.Round((double)(masterplan[x].y + 1) / 2048 * 100).ToString() + "%";
+                string speed1 = Math.Round((double)src.nonces / 4096 * 2 * (masterplan[x].y + 1) * 60 / (elapsed.TotalSeconds + 1)).ToString() + " nonces/m ";
+                string speed2 = "(" + (Math.Round((double)src.nonces / (2 << 12) * (masterplan[x].y + 1) / (elapsed.TotalSeconds + 1))).ToString() + "MB/s)";
+                string speed = speed1 + speed2;
+                Console.Write("Completed: " + completed + ", Elapsed: " + TimeSpanToString(elapsed) + ", Remaining: " + TimeSpanToString(togo) + ", Speed: " + speed + "          \r");
+            }
+            //perform last write
+            if (!halt1 && !halt2) Th_write(masterplan[masterplan.LongLength - 1]);
+            if (halt1 || halt2)
+            {
+                Console.Error.WriteLine("ERR: Shutting down!");
+                return;
+            }
+
+            //mark progress resume
 
             //mark as finished
 
+            // close reader/writer
+            reader.Close();
+            writer.Close();
+
         }
 
+        public static void Th_read(object stateInfo)
+        {
+            TaskInfo ti = (TaskInfo)stateInfo;
+
+            //determine cache cycle and front scoop back scoop cycle to alternate
+            if (ti.x % 2 == 0)
+            {
+                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(ti.y, ti.src.nonces, ti.z, ti.scoop1, Math.Min(ti.src.nonces - ti.z, ti.limit));
+                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(4095 - ti.y, ti.src.nonces, ti.z, ti.scoop2, Math.Min(ti.src.nonces - ti.z, ti.limit));
+                if (ti.shuffle) Poc1poc2shuffle(ti.scoop1, ti.scoop2, Math.Min(ti.src.nonces - ti.z, ti.limit));
+            }
+            else
+            {
+                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(4095 - ti.y, ti.src.nonces, ti.z, ti.scoop4, Math.Min(ti.src.nonces - ti.z, ti.limit));
+                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(ti.y, ti.src.nonces, ti.z, ti.scoop3, Math.Min(ti.src.nonces - ti.z, ti.limit));
+                if (ti.shuffle) Poc1poc2shuffle(ti.scoop3, ti.scoop4, Math.Min(ti.src.nonces - ti.z, ti.limit));
+            }
+            if (ti.x != 0) autoEvents[0].Set();
+        }
+
+        public static void Th_write(object stateInfo)
+        {
+            TaskInfo ti = (TaskInfo)stateInfo;
+            if (ti.x % 2 == 0)
+            {
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, ti.tar.nonces, ti.z + (long)(ti.src.start - ti.tar.start), ti.scoop1, Math.Min(ti.src.nonces - ti.z, ti.limit));
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, ti.tar.nonces, ti.z + (long)(ti.src.start - ti.tar.start), ti.scoop2, Math.Min(ti.src.nonces - ti.z, ti.limit));
+            }
+            else
+            {
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, ti.tar.nonces, ti.z + (long)(ti.src.start - ti.tar.start), ti.scoop4, Math.Min(ti.src.nonces - ti.z, ti.limit));
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, ti.tar.nonces, ti.z + (long)(ti.src.start - ti.tar.start), ti.scoop3, Math.Min(ti.src.nonces - ti.z, ti.limit));
+            }
+            if (ti.x != (ti.end - 1))
+            {
+                autoEvents[1].Set();
+            }
+        }
 
         private void btn_CreateEmptyPlotFile_Click(object sender, EventArgs e)
         {

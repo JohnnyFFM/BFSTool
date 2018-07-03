@@ -283,9 +283,9 @@
             this.lbl_capa.AutoSize = true;
             this.lbl_capa.Location = new System.Drawing.Point(667, 441);
             this.lbl_capa.Name = "lbl_capa";
-            this.lbl_capa.Size = new System.Drawing.Size(110, 13);
+            this.lbl_capa.Size = new System.Drawing.Size(119, 13);
             this.lbl_capa.TabIndex = 22;
-            this.lbl_capa.Text = "1.41 GiB free of 8 GiB";
+            this.lbl_capa.Text = "x.xx GiB free of x.xx GiB";
             // 
             // tb_id
             // 

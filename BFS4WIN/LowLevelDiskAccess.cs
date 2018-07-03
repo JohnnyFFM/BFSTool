@@ -13,6 +13,8 @@ namespace BFS4WIN
     // routines taken from https://code.msdn.microsoft.com/windowsapps/CCS-LABS-C-Low-Level-Disk-91676ca9
     class LowLevelDiskAccess
     {
+        SafeFileHandle iFile;
+
         #region "API CALLS" 
 
         public enum EMoveMethod : uint
@@ -46,7 +48,7 @@ namespace BFS4WIN
            int numBytesToRead, out int numBytesRead, IntPtr overlapped_MustBeZero);
 
         [DllImport("kernel32", SetLastError = true)]
-        internal extern static int WriteFile(SafeFileHandle handle, byte[] bytes,
+        internal extern static int WriteFile(SafeFileHandle handle,IntPtr bytes, //byte[] bytes,
            int numBytesToWrite, out int numBytesRead, IntPtr overlapped_MustBeZero);
 
         [DllImportAttribute("kernel32.dll", EntryPoint = "DeviceIoControl", SetLastError = true)]
@@ -158,6 +160,50 @@ namespace BFS4WIN
             return buf;
         }
 
+
+        public Boolean OpenW(string drive)
+        {
+            short FILE_ATTRIBUTE_NORMAL = 0x80;
+            short INVALID_HANDLE_VALUE = -1;
+            uint GENERIC_READ = 0x80000000;
+            uint GENERIC_WRITE = 0x40000000;
+            uint CREATE_NEW = 1;
+            uint CREATE_ALWAYS = 2;
+            uint OPEN_EXISTING = 3;
+
+            iFile = CreateFile(drive, GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
+            if (iFile.IsInvalid)
+            {
+                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+            }
+            return true;
+        }
+
+        public void Close()
+        {
+            iFile.Close();
+        }
+
+
+        public void Seek(Int64 position)
+        {
+            Int64 filePos;
+            if (!SetFilePointerEx(iFile, position, out filePos, EMoveMethod.Begin))
+            {
+                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+            }
+        }
+
+        public int Write(byte[] data, Int32 offset, Int32 length)
+        {
+            GCHandle pinnedArray = GCHandle.Alloc(data, GCHandleType.Pinned);
+            IntPtr pointer = pinnedArray.AddrOfPinnedObject();
+            int write = 0;
+            WriteFile(iFile, IntPtr.Add(pointer,offset), length, out write, IntPtr.Zero);
+            pinnedArray.Free();
+            return write;
+        }
+
         public byte[] ReadSectors(string drive, Int64 sector, Int32 bytesPerSector, Int32 number)
         {
             short FILE_ATTRIBUTE_NORMAL = 0x80;
@@ -212,7 +258,10 @@ namespace BFS4WIN
                 Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
             }
             int write = 0;
-            WriteFile(handleValue, data, data.Length, out write, IntPtr.Zero);
+            GCHandle pinnedArray = GCHandle.Alloc(data, GCHandleType.Pinned);
+            IntPtr pointer = pinnedArray.AddrOfPinnedObject();
+            WriteFile(handleValue, pointer, data.Length, out write, IntPtr.Zero);
+            pinnedArray.Free();
             handleValue.Close();
             //return buf;
         }

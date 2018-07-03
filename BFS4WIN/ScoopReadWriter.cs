@@ -12,6 +12,7 @@ namespace BFS4WIN
     /// </summary>
     public class ScoopReadWriter
     {
+        private static LowLevelDiskAccess llda;
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool SetFileValidData(SafeFileHandle hFile, long ValidDataLength);
         protected string _FileName;
@@ -57,21 +58,13 @@ namespace BFS4WIN
             return true;
         }
 
-        public Boolean OpenW(bool directIO)
+        public Boolean OpenW()
         {
             try
             {
-                //assert priviliges
-
-                if (directIO)
-                {
-                    _fs = new FileStream(_FileName, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, 1048576, FileFlagNoBuffering);
-                }
-                else
-                {
-                    _fs = new FileStream(_FileName, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, 1048576, FileOptions.WriteThrough);
-                }
-            }catch (Exception e)
+                llda.OpenW(_FileName);
+            }
+            catch (Exception e)
             {
                 //MessageBox.Show(e.Message, "Error Opening File", MessageBoxButtons.OK);
                 if (_fs != null) _fs.Close();
@@ -118,7 +111,7 @@ namespace BFS4WIN
             _lPosition = scoop * (64 * totalNonces) + startNonce * 64;
             try
             {
-                _fs.Seek(_lPosition, SeekOrigin.Begin);
+                llda.Seek(_lPosition);
             }
             catch (Exception e)
             {
@@ -127,9 +120,9 @@ namespace BFS4WIN
             }
             try
             {
-                //interrupt avoider 1mb read 64*16384
+                //interrupt avoider 1mb write 64*16384
                 for (int i = 0; i < limit * 64; i += (64 * 16384))
-                    _fs.Write(source.byteArrayField, i, Math.Min(64 * 16384, limit * 64 - i));
+                    llda.Write(source.byteArrayField, i, Math.Min(64 * 16384, limit * 64 - i));
             }
             catch (Exception e)
             {
