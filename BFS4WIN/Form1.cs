@@ -24,12 +24,13 @@ namespace BFS4WIN
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            //Query drives on load
             btn_QueryDrives_Click(null,null);
         }
 
+        //query drives and get drive info
         private void btn_QueryDrives_Click(object sender, EventArgs e)
         {
-
             drivesView.Items.Clear();
             ArrayList result;
             result = llda.GetDriveList();
@@ -61,22 +62,28 @@ namespace BFS4WIN
             ClearBFSView();
         }
 
-
-
+        //Format drive to BFS
         private void btn_format_Click(object sender, EventArgs e)
         {
             if (drivesView.SelectedItems.Count > 0)
             {
+                String drive = drivesView.SelectedItems[0].SubItems[1].Text;
+
+                UInt64 id = 0;
+                if (Dialogs.ShowInputDialog("Please enter numeric ID", ref id) != DialogResult.OK)
+                {
+                    return;
+                }
+
                 //Issue Warning
-                DialogResult result = MessageBox.Show("WARNING: Formatting will erase ALL data on this disk." + "\n" + "To format the disk, press OK. To quit, click CANCEL.", "Format Local Disk ( "+ drivesView.SelectedItems[0].SubItems[1].Text + ")", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                DialogResult result = MessageBox.Show("WARNING: Formatting will erase ALL data on this disk." + "\n" + "To format the disk, press OK. To quit, click CANCEL.", "Format Local Disk ( "+ drive + ")", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.Cancel) return;
 
                 UInt32 bytesPerSector = (UInt32.Parse(drivesView.SelectedItems[0].SubItems[3].Text));
                 UInt64 totalSectors = (UInt64.Parse(drivesView.SelectedItems[0].SubItems[2].Text));
-                String drive = drivesView.SelectedItems[0].SubItems[1].Text;
 
                 //Format Drive using GPT, MBR would only make sense for small drives and small drives dont make sense for Burst
-                BFS.FormatDriveGPT(drive, totalSectors, bytesPerSector);
+                BFS.FormatDriveGPT(drive, totalSectors, bytesPerSector, id);
                 //Success
                 MessageBox.Show("Format Complete.\t\t\t", "Formatting " + drivesView.SelectedItems[0].SubItems[1].Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 //Refresh drives
@@ -92,6 +99,7 @@ namespace BFS4WIN
                              .ToArray();
         }
 
+        //Parse PoC1 and PoC2 plot file names. For PoC2 stagger will be set to 0;
         private PlotFile ParsePlotFileName(string name)
         {
             string[] temp = name.Split('\\');
@@ -100,20 +108,42 @@ namespace BFS4WIN
             result.id = Convert.ToUInt64(pfn[0]);
             result.startNonce = Convert.ToUInt64(pfn[1]);
             result.nonces = Convert.ToUInt32(pfn[2]);
+            result.stagger = 0;
             if (pfn.Length == 4)
             {
-
-                //Todo conversion
-                return result;
+                result.stagger = Convert.ToUInt32(pfn[3]);
             }
-
             return result;
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        //Task description for dual-threadding
+        struct TaskInfo
         {
+            public ScoopReadWriter reader;
+            public string target;
+            public int y;
+            public int z;
+            public int x;
+            public int limit;
+            public PlotFile src;
+            public PlotFile tar;
+            public Scoop scoop1;
+            public Scoop scoop2;
+            public Scoop scoop3;
+            public Scoop scoop4;
+            public bool shuffle;
+            public long end;
+        }
+
+        //upload a file to a BFS formatted drive
+        private void btn_upload_Click(object sender, EventArgs e)
+        {
+            String drive = drivesView.SelectedItems[0].SubItems[1].Text;
+            Boolean shuffle = false;
             PlotFile temp;
             //Let user select plotfile
+            string filter = "PoC2 plot files | " + tb_id.Text + "_ * _ *.*| PoC1 plot files| " + tb_id.Text + "_ * _ * _ *.*";
+            openFileDialog.Filter = filter;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 //Parse Flotfilename
@@ -125,14 +155,21 @@ namespace BFS4WIN
             }
 
             //only support optimized files
-            //if (temp.stagger > 0 && temp.stagger != temp.nonces) return;
-            //Read current bfsTOC
-            BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(drivesView.SelectedItems[0].SubItems[1].Text, 1, 4096));
-            //update bfsTOC
-            int position = bfsTOC.AddPlotFile(temp.startNonce, temp.nonces/64*64, 2, 0);
-            if (position == -1) return;
-            //save bfsTOC
-            llda.WriteSector(drivesView.SelectedItems[0].SubItems[1].Text, 1, 4096, bfsTOC.ToByteArray());
+            if (temp.stagger > 0 && temp.stagger != temp.nonces) return;
+
+            //always convert PoC1 files
+            if (temp.stagger == temp.nonces) shuffle = true;
+
+            //check ID
+            if (temp.id.ToString() != tb_id.Text) return;
+
+            //Create file in bfsTOC
+            int file = BFS.AddPlotFile(drive, temp.startNonce,temp.nonces/64*64,2,0);
+
+            //Get offsets
+            UInt64 startOffset = BFS.bfsTOC.plotFiles[file].startPos;
+            UInt64 scoopOffset = BFS.bfsTOC.diskspace / 4096;
+
             //transfer file
             //open source handle
             ScoopReadWriter reader; ;
@@ -158,12 +195,12 @@ namespace BFS4WIN
                     masterplan[y * loops + zz].x = y * loops + zz;
                     masterplan[y * loops + zz].limit = limit;
                     masterplan[y * loops + zz].src = temp;
-                  //  masterplan[y * loops + zz].tar = bfsTOC.plotFiles[position];
-                    //masterplan[y * loops + zz].scoop1 = scoop1;
-                   // masterplan[y * loops + zz].scoop2 = scoop2;
-                   // masterplan[y * loops + zz].scoop3 = scoop3;
-                   // masterplan[y * loops + zz].scoop4 = scoop4;
-                   // masterplan[y * loops + zz].shuffle = shuffle;
+                    masterplan[y * loops + zz].tar = bfsTOC.plotFiles[position];
+                    masterplan[y * loops + zz].scoop1 = scoop1;
+                    masterplan[y * loops + zz].scoop2 = scoop2;
+                    masterplan[y * loops + zz].scoop3 = scoop3;
+                    masterplan[y * loops + zz].scoop4 = scoop4;
+                    masterplan[y * loops + zz].shuffle = shuffle;
                     masterplan[y * loops + zz].end = masterplan.LongLength;
                     zz += 1;
                 }
@@ -171,51 +208,14 @@ namespace BFS4WIN
 
 
             //execute taskplan
+
             //mark progress resume
 
 
             //mark as finished
-            bfsTOC.plotFiles[position].status = 1;
-            bfsTOC.plotFiles[position].pos = temp.nonces;
-            bfsTOC.UpdateCRC32();
-            //save bfsTOC
-            llda.WriteSector(drivesView.SelectedItems[0].SubItems[1].Text, 0, 4096, bfsTOC.ToByteArray());
+
         }
 
-        private void buttfgon8_Click(object sender, EventArgs e)
-        {
-            //Read current bfsTOC
-            BFSTOC bfsTOC = BFSTOC.FromSector(llda.ReadSector(drivesView.SelectedItems[0].SubItems[1].Text, 0, 4096));
-            //Check CRC32
-            //if fail try Mirror
-            //if not fail, check if mirror is identical
-            //if not copy over
-            //count current files
-          //  bfsTOC.AddPlotFile(13014439754249942082, 1857887936, 0, 2, 0);
-            llda.WriteSector(drivesView.SelectedItems[0].SubItems[1].Text, 0, 4096, bfsTOC.ToByteArray());
-        }
-
-        struct TaskInfo
-        {
-            public ScoopReadWriter reader;
-            public string target;
-            public int y;
-            public int z;
-            public int x;
-            public int limit;
-            public PlotFile src;
-            public PlotFile tar;
-            //public Scoop scoop1;
-           // public Scoop scoop2;
-           // public Scoop scoop3;
-           // public Scoop scoop4;
-            public bool shuffle;
-            public long end;
-        }
-
-  
-
-  
 
         private void btn_CreateEmptyPlotFile_Click(object sender, EventArgs e)
         {
@@ -223,17 +223,20 @@ namespace BFS4WIN
 
             UInt64 sn = 0;
             UInt32 nonces = 0;
-            if (ShowInputDialog2(drive,"Create new plot file...", ref sn, ref nonces) == DialogResult.OK)
+            //show dialog
+            if (Dialogs.ShowInputDialog2(drive, "Create new plot file...", ref sn, ref nonces) == DialogResult.OK)
             {
-                //add
-                BFS.AddPlotFile(drive, sn, nonces, 2, 0);
-                //if()
-                FillBFSView(drive);
-              //             else {
-                //    MessageBox.Show("File Creation failed.\t\t\t", "Create file on" + drive, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                //}
-            }
+                //create file
+                if (BFS.AddPlotFile(drive, sn, nonces, 3, 0) > -1)
+                {
+                    FillBFSView(drive);
+                }
+                else
+                {
+                    MessageBox.Show("File Creation failed.\t\t\t", "Create file on" + drive, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
 
+            }
         }
 
         private void btn_deleteFile_Click(object sender, EventArgs e)
@@ -246,18 +249,6 @@ namespace BFS4WIN
             else
             {
                 MessageBox.Show("File Deletion failed.\t\t\t", "Delete last file on" + drive, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-        }
-
-        private void button5_Click(object sender, EventArgs e)
-        {
-            if (drivesView.SelectedItems.Count > 0)
-            {
-                GPT gpt = GPT.FromSectors(llda.ReadSector(drivesView.SelectedItems[0].SubItems[1].Text, 0, 4096*5));
-               // gpt.gptHeader.UpdateCRC32(CRC.CRC32(gpt.gptPartitionTable.ToByteArray()));
-
-             
-
             }
         }
 
@@ -280,7 +271,6 @@ namespace BFS4WIN
         private void FillBFSView(string drive)
         {
             //enable buttons
-            btn_setID.Enabled = true;
             btn_createEmptyPlotFile.Enabled = true;
             btn_deleteFile.Enabled = true;
             btn_upload.Enabled = true;
@@ -319,9 +309,12 @@ namespace BFS4WIN
                                 item.SubItems.Add("OK.");
                                 break;
                             case 2:
-                                item.SubItems.Add("In Creation. Nonces plotted: " + x.pos.ToString());
+                                item.SubItems.Add("In Creation. ScoopPairs transferred: " + x.pos.ToString());
                                 break;
                             case 3:
+                                item.SubItems.Add("In Creation. Nonces plotted: " + x.pos.ToString());
+                                break;
+                            case 4:
                                 item.SubItems.Add("Converting. Scoop Pair Progress: " + x.pos.ToString());
                                 break;
                         }
@@ -342,7 +335,6 @@ namespace BFS4WIN
             //disable buttons
             btn_createEmptyPlotFile.Enabled = false;
             btn_deleteFile.Enabled = false;
-            btn_setID.Enabled = false;
             btn_upload.Enabled = false;
             btn_download.Enabled = false;
             bfsView.Items.Clear();
@@ -376,169 +368,21 @@ namespace BFS4WIN
 
         }
 
-        private static DialogResult ShowInputDialog(string message, ref UInt64 input)
-        {
-            System.Drawing.Size size = new System.Drawing.Size(200, 70);
-            Form inputBox = new Form();
-
-            inputBox.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            inputBox.ClientSize = size;
-            inputBox.ControlBox = false;
-            inputBox.StartPosition = FormStartPosition.CenterScreen;
-            inputBox.Text = message;
-
-            System.Windows.Forms.TextBox textBox = new TextBox();
-            textBox.Size = new System.Drawing.Size(size.Width - 10, 23);
-            textBox.Location = new System.Drawing.Point(5, 5);
-            textBox.Text = "";
-            textBox.MaxLength = 20;
-            inputBox.Controls.Add(textBox);
-
-            Button okButton = new Button();
-            okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            okButton.Name = "okButton";
-            okButton.Size = new System.Drawing.Size(75, 23);
-            okButton.Text = "&OK";
-            okButton.Location = new System.Drawing.Point(size.Width - 80 - 80, 39);
-            inputBox.Controls.Add(okButton);
-
-            Button cancelButton = new Button();
-            cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            cancelButton.Name = "cancelButton";
-            cancelButton.Size = new System.Drawing.Size(75, 23);
-            cancelButton.Text = "&Cancel";
-            cancelButton.Location = new System.Drawing.Point(size.Width - 80, 39);
-            inputBox.Controls.Add(cancelButton);
-
-            inputBox.AcceptButton = okButton;
-            inputBox.CancelButton = cancelButton;
-
-            DialogResult result = inputBox.ShowDialog();
-            UInt64.TryParse(textBox.Text, out input);
-            return result;
-        }
-
-        private static DialogResult ShowInputDialog2(string drive, string message, ref UInt64 input1, ref UInt32 input2)
-        {
-            //get boundaries
-            BFS.LoadBFSTOC(drive);
-            UInt32 totalNonces  = (UInt32)(BFS.bfsTOC.diskspace / 64);
-
-            //Clear Files
-            UInt32 noncesUsed = 0;
-            foreach (BFSPlotFile x in BFS.bfsTOC.plotFiles)
-            {
-                if (x.status != 0)
-                {
-                    noncesUsed += x.nonces;
-                }
-            }
-            
-            
-            System.Drawing.Size size = new System.Drawing.Size(300, 200);
-            Form inputBox = new Form();
-            
-            inputBox.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            inputBox.ClientSize = size;
-            inputBox.ControlBox = false;
-            inputBox.StartPosition = FormStartPosition.CenterScreen;
-            inputBox.Text = message;
-
-            System.Windows.Forms.Label lbl_sn = new Label();
-            lbl_sn.Size = new System.Drawing.Size(70, 23);
-            lbl_sn.Location = new System.Drawing.Point(10, 8);
-            lbl_sn.Text = "Start Nonce: ";            
-            inputBox.Controls.Add(lbl_sn);
-
-            System.Windows.Forms.TextBox textBox = new TextBox();
-            textBox.Size = new System.Drawing.Size(size.Width - 90, 23);
-            textBox.Location = new System.Drawing.Point(80, 5);
-            textBox.Text = "";
-            textBox.TextAlign = HorizontalAlignment.Right;
-            textBox.MaxLength = 20;
-            inputBox.Controls.Add(textBox);
-
-            System.Windows.Forms.Label lbl_sn2 = new Label();
-            lbl_sn2.Size = new System.Drawing.Size(70, 23);
-            lbl_sn2.Location = new System.Drawing.Point(10, 37);
-            lbl_sn2.Text = "Nonces: ";
-            inputBox.Controls.Add(lbl_sn2);
-
-            System.Windows.Forms.NumericUpDown nonces = new NumericUpDown();
-            nonces.Size = new System.Drawing.Size(size.Width - 90, 23);
-            nonces.Location = new System.Drawing.Point(80, 34);
-            nonces.Text = "";
-            nonces.Maximum = 9999999;
-            nonces.TextAlign = HorizontalAlignment.Right;
-            nonces.Increment = 64;
-            inputBox.Controls.Add(nonces);
-
-            //Trackbar 
-            System.Windows.Forms.TrackBar trackbar = new TrackBar();
-            trackbar.Size = new System.Drawing.Size(size.Width - 80, 45);
-            trackbar.Location = new System.Drawing.Point(75, 63);
-            trackbar.SmallChange = 64;
-            trackbar.LargeChange = (int)(totalNonces-noncesUsed)/64;
-            trackbar.TickFrequency = trackbar.LargeChange;
-            trackbar.Maximum = (int)(totalNonces - noncesUsed);
-            trackbar.ValueChanged += new EventHandler(yourMethod);
-
-            void yourMethod(object s, EventArgs e)
-            {
-                nonces.Value = trackbar.Value;
-            }
-            inputBox.Controls.Add(trackbar);
-
-
-            System.Windows.Forms.Label lbl_sn3 = new Label();
-            lbl_sn3.Size = new System.Drawing.Size(70, 23);
-            lbl_sn3.Location = new System.Drawing.Point(10, 111);
-            lbl_sn3.Text = "Capacity: ";
-            inputBox.Controls.Add(lbl_sn3);
-
-            //progressbar
-            System.Windows.Forms.ProgressBar progress = new ProgressBar();
-            progress.Size = new System.Drawing.Size(size.Width - 90, 16);
-            progress.Location = new System.Drawing.Point(80, 110);
-            inputBox.Controls.Add(progress);
-
-            //lbl_capa.Text = ((decimal)((int)(BFS.bfsTOC.diskspace / 64) - (int)(totalNonces)) / 4 / 1024).ToString("0.00") + " GiB free of" + ((decimal)BFS.bfsTOC.diskspace * 4096 / 1024 / 1024 / 1024).ToString("0.00") + " GiB";
-
-            Button okButton = new Button();
-            okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            okButton.Name = "okButton";
-            okButton.Size = new System.Drawing.Size(75, 23);
-            okButton.Text = "&OK";
-            okButton.Location = new System.Drawing.Point(size.Width - 85 - 80, 150);
-            inputBox.Controls.Add(okButton);
-
-            Button cancelButton = new Button();
-            cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            cancelButton.Name = "cancelButton";
-            cancelButton.Size = new System.Drawing.Size(75, 23);
-            cancelButton.Text = "&Cancel";
-            cancelButton.Location = new System.Drawing.Point(size.Width - 85, 150);
-            inputBox.Controls.Add(cancelButton);
-
-            inputBox.AcceptButton = okButton;
-            inputBox.CancelButton = cancelButton;
-
-            DialogResult result = inputBox.ShowDialog();
-            UInt64.TryParse(textBox.Text, out input1);
-            input2 = (uint)nonces.Value;
-
-            return result;
-        }
 
         private void button1_Click_1(object sender, EventArgs e)
         {
             String drive = drivesView.SelectedItems[0].SubItems[1].Text;
             UInt64 id = 0;
-            if (ShowInputDialog("Please enter numeric ID", ref id) == DialogResult.OK) {
+            if (Dialogs.ShowInputDialog("Please enter numeric ID", ref id) == DialogResult.OK) {
                 BFS.SetID(drive,id);
                 //update ID
                 tb_id.Text = id.ToString();
             }
+
+        }
+
+        private void btn_plot_Click(object sender, EventArgs e)
+        {
 
         }
     }

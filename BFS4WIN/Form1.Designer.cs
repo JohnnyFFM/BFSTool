@@ -63,10 +63,10 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.label8 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
-            this.btn_setID = new System.Windows.Forms.Button();
             this.capacity = new System.Windows.Forms.ProgressBar();
             this.btn_plot = new System.Windows.Forms.Button();
             this.btn_optimize = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.memLimit)).BeginInit();
             this.SuspendLayout();
             // 
@@ -83,10 +83,10 @@
             this.columnHeader8});
             this.drivesView.FullRowSelect = true;
             this.drivesView.HideSelection = false;
-            this.drivesView.Location = new System.Drawing.Point(12, 25);
+            this.drivesView.Location = new System.Drawing.Point(12, 33);
             this.drivesView.MultiSelect = false;
             this.drivesView.Name = "drivesView";
-            this.drivesView.Size = new System.Drawing.Size(796, 179);
+            this.drivesView.Size = new System.Drawing.Size(796, 171);
             this.drivesView.TabIndex = 0;
             this.drivesView.UseCompatibleStateImageBehavior = false;
             this.drivesView.View = System.Windows.Forms.View.Details;
@@ -135,7 +135,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(11, 9);
+            this.label1.Location = new System.Drawing.Point(14, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(37, 13);
             this.label1.TabIndex = 1;
@@ -164,7 +164,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 245);
+            this.label2.Location = new System.Drawing.Point(14, 251);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(72, 13);
             this.label2.TabIndex = 7;
@@ -180,9 +180,9 @@
             this.columnHeader13});
             this.bfsView.FullRowSelect = true;
             this.bfsView.HideSelection = false;
-            this.bfsView.Location = new System.Drawing.Point(12, 261);
+            this.bfsView.Location = new System.Drawing.Point(12, 275);
             this.bfsView.Name = "bfsView";
-            this.bfsView.Size = new System.Drawing.Size(796, 163);
+            this.bfsView.Size = new System.Drawing.Size(796, 149);
             this.bfsView.TabIndex = 6;
             this.bfsView.UseCompatibleStateImageBehavior = false;
             this.bfsView.View = System.Windows.Forms.View.Details;
@@ -213,17 +213,17 @@
             // 
             // btn_upload
             // 
-            this.btn_upload.Location = new System.Drawing.Point(242, 479);
+            this.btn_upload.Location = new System.Drawing.Point(242, 474);
             this.btn_upload.Name = "btn_upload";
             this.btn_upload.Size = new System.Drawing.Size(109, 23);
             this.btn_upload.TabIndex = 8;
             this.btn_upload.Text = "Upload File";
             this.btn_upload.UseVisualStyleBackColor = true;
-            this.btn_upload.Click += new System.EventHandler(this.button4_Click);
+            this.btn_upload.Click += new System.EventHandler(this.btn_upload_Click);
             // 
             // btn_deleteFile
             // 
-            this.btn_deleteFile.Location = new System.Drawing.Point(127, 479);
+            this.btn_deleteFile.Location = new System.Drawing.Point(127, 474);
             this.btn_deleteFile.Name = "btn_deleteFile";
             this.btn_deleteFile.Size = new System.Drawing.Size(109, 23);
             this.btn_deleteFile.TabIndex = 9;
@@ -234,7 +234,7 @@
             // btn_download
             // 
             this.btn_download.Enabled = false;
-            this.btn_download.Location = new System.Drawing.Point(357, 479);
+            this.btn_download.Location = new System.Drawing.Point(357, 474);
             this.btn_download.Name = "btn_download";
             this.btn_download.Size = new System.Drawing.Size(109, 23);
             this.btn_download.TabIndex = 10;
@@ -243,7 +243,7 @@
             // 
             // btn_createEmptyPlotFile
             // 
-            this.btn_createEmptyPlotFile.Location = new System.Drawing.Point(12, 479);
+            this.btn_createEmptyPlotFile.Location = new System.Drawing.Point(12, 474);
             this.btn_createEmptyPlotFile.Name = "btn_createEmptyPlotFile";
             this.btn_createEmptyPlotFile.Size = new System.Drawing.Size(109, 23);
             this.btn_createEmptyPlotFile.TabIndex = 12;
@@ -267,6 +267,7 @@
             this.tb_version.ReadOnly = true;
             this.tb_version.Size = new System.Drawing.Size(64, 20);
             this.tb_version.TabIndex = 17;
+            this.tb_version.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label4
             // 
@@ -293,6 +294,7 @@
             this.tb_id.ReadOnly = true;
             this.tb_id.Size = new System.Drawing.Size(186, 20);
             this.tb_id.TabIndex = 27;
+            this.tb_id.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label9
             // 
@@ -305,7 +307,6 @@
             // 
             // openFileDialog
             // 
-            this.openFileDialog.FileName = "openFileDialog1";
             this.openFileDialog.Filter = "PoC2 plot files|*_*_*.*|PoC1 plot files|*_*_*_*.*";
             // 
             // memLimit
@@ -315,7 +316,7 @@
             0,
             0,
             0});
-            this.memLimit.Location = new System.Drawing.Point(715, 482);
+            this.memLimit.Location = new System.Drawing.Point(712, 249);
             this.memLimit.Maximum = new decimal(new int[] {
             4096,
             0,
@@ -329,6 +330,7 @@
             this.memLimit.Name = "memLimit";
             this.memLimit.Size = new System.Drawing.Size(62, 20);
             this.memLimit.TabIndex = 29;
+            this.memLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.memLimit.Value = new decimal(new int[] {
             4096,
             0,
@@ -337,7 +339,7 @@
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 518);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 514);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(820, 22);
             this.statusStrip1.SizingGrip = false;
@@ -347,30 +349,20 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(671, 484);
+            this.label8.Location = new System.Drawing.Point(600, 251);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(38, 13);
+            this.label8.Size = new System.Drawing.Size(106, 13);
             this.label8.TabIndex = 31;
-            this.label8.Text = "Cache";
+            this.label8.Text = "File Operation Cache";
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(783, 484);
+            this.label10.Location = new System.Drawing.Point(780, 251);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(23, 13);
             this.label10.TabIndex = 32;
             this.label10.Text = "MB";
-            // 
-            // btn_setID
-            // 
-            this.btn_setID.Location = new System.Drawing.Point(354, 210);
-            this.btn_setID.Name = "btn_setID";
-            this.btn_setID.Size = new System.Drawing.Size(165, 23);
-            this.btn_setID.TabIndex = 33;
-            this.btn_setID.Text = "Set Numeric ID";
-            this.btn_setID.UseVisualStyleBackColor = true;
-            this.btn_setID.Click += new System.EventHandler(this.button1_Click_1);
             // 
             // capacity
             // 
@@ -382,31 +374,42 @@
             // btn_plot
             // 
             this.btn_plot.Enabled = false;
-            this.btn_plot.Location = new System.Drawing.Point(525, 210);
+            this.btn_plot.Location = new System.Drawing.Point(354, 210);
             this.btn_plot.Name = "btn_plot";
             this.btn_plot.Size = new System.Drawing.Size(165, 23);
             this.btn_plot.TabIndex = 13;
             this.btn_plot.Text = "Plot Disk";
             this.btn_plot.UseVisualStyleBackColor = true;
+            this.btn_plot.Click += new System.EventHandler(this.btn_plot_Click);
             // 
             // btn_optimize
             // 
             this.btn_optimize.Enabled = false;
-            this.btn_optimize.Location = new System.Drawing.Point(472, 479);
+            this.btn_optimize.Location = new System.Drawing.Point(472, 474);
             this.btn_optimize.Name = "btn_optimize";
             this.btn_optimize.Size = new System.Drawing.Size(109, 23);
             this.btn_optimize.TabIndex = 37;
             this.btn_optimize.Text = "Optimize TOC";
             this.btn_optimize.UseVisualStyleBackColor = true;
             // 
+            // button1
+            // 
+            this.button1.Enabled = false;
+            this.button1.Location = new System.Drawing.Point(587, 474);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(109, 23);
+            this.button1.TabIndex = 38;
+            this.button1.Text = "Plot File";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(820, 540);
+            this.ClientSize = new System.Drawing.Size(820, 536);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.btn_optimize);
             this.Controls.Add(this.capacity);
-            this.Controls.Add(this.btn_setID);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.statusStrip1);
@@ -476,10 +479,10 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Button btn_setID;
         private System.Windows.Forms.ProgressBar capacity;
         private System.Windows.Forms.Button btn_plot;
         private System.Windows.Forms.Button btn_optimize;
+        private System.Windows.Forms.Button button1;
     }
 }
 

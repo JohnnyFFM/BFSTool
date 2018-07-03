@@ -73,13 +73,14 @@ namespace BFS4WIN
             return result;
         }
 
-        public static void FormatDriveGPT(string drive, UInt64 totalSectors, UInt32 bytesPerSector)
+        public static void FormatDriveGPT(string drive, UInt64 totalSectors, UInt32 bytesPerSector, UInt64 id)
         {
             //create GPT
             GPT gpt = new GPT(totalSectors, bytesPerSector);
             byte[] test = gpt.ToByteArray();
             //create BFSTOC
             BFSTOC bfsTOC = BFSTOC.emptyToc(totalSectors, bytesPerSector, true);
+            bfsTOC.id = id;
             //write GPT
             llda.WriteSector(drive, 0, 4096, gpt.ToByteArray());
             //write MirrorGPT
@@ -89,24 +90,6 @@ namespace BFS4WIN
             llda.WriteSector(drive, 5, 4096, bfsTOC.ToByteArray());
             //write mirror BFSTOC
             llda.WriteSector(drive, 6 + (Int64)bfsTOC.diskspace, 4096, bfsTOC.ToByteArray());
-            //trigger OS partition table re-read
-            llda.refreshDrive(drive);
-        }
-
-        public static void FormatDriveMBR(string drive, UInt64 totalSectors, UInt32 bytesPerSector)
-        {
-            //create classic MBR
-            MBR mbr = new MBR((UInt32)totalSectors, bytesPerSector, false);
-            //inflate to 4k
-            Array.Resize(ref mbr.mbr, 4096);
-            //create BFSTOC
-            BFSTOC bfsTOC = BFSTOC.emptyToc(totalSectors, bytesPerSector, false);
-            //write MBR
-            llda.WriteSector(drive, 0, 4096, mbr.ToByteArray());
-            //write  BFSTOC
-            llda.WriteSector(drive, 1, 4096, bfsTOC.ToByteArray());
-            //write mirror BFSTOC
-            llda.WriteSector(drive, 2 + (Int64)bfsTOC.diskspace, 4096, bfsTOC.ToByteArray());
             //trigger OS partition table re-read
             llda.refreshDrive(drive);
         }
