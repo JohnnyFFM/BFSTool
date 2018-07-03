@@ -47,7 +47,7 @@ namespace BFS4WIN
 
         [DllImport("kernel32", SetLastError = true)]
         internal extern static int WriteFile(SafeFileHandle handle, byte[] bytes,
-           int numBytesToRead, out int numBytesRead, IntPtr overlapped_MustBeZero);
+           int numBytesToWrite, out int numBytesRead, IntPtr overlapped_MustBeZero);
 
         [DllImportAttribute("kernel32.dll", EntryPoint = "DeviceIoControl", SetLastError = true)]
         [return: MarshalAsAttribute(UnmanagedType.Bool)]
@@ -158,6 +158,38 @@ namespace BFS4WIN
             return buf;
         }
 
+        public byte[] ReadSectors(string drive, Int64 sector, Int32 bytesPerSector, Int32 number)
+        {
+            short FILE_ATTRIBUTE_NORMAL = 0x80;
+            short INVALID_HANDLE_VALUE = -1;
+            uint GENERIC_READ = 0x80000000;
+            uint GENERIC_WRITE = 0x40000000;
+            uint CREATE_NEW = 1;
+            uint CREATE_ALWAYS = 2;
+            uint OPEN_EXISTING = 3;
+
+            SafeFileHandle handleValue = CreateFile(drive, GENERIC_READ, 0, IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
+            if (handleValue.IsInvalid)
+            {
+                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+            }
+
+            //calculate byte position
+            Int64 sec = sector * bytesPerSector;
+
+            byte[] buf = new byte[bytesPerSector];
+            Int64 filePos;
+            if (!SetFilePointerEx(handleValue, sec, out filePos, EMoveMethod.Begin))
+            {
+                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+            }
+
+            int read = 0;
+            ReadFile(handleValue, buf, bytesPerSector*number, out read, IntPtr.Zero);
+            handleValue.Close();
+            return buf;
+        }
+
         public void WriteSector(string drive, Int64 sector, Int32 bytesPerSector, byte[] data)
         {
             short FILE_ATTRIBUTE_NORMAL = 0x80;
@@ -174,18 +206,13 @@ namespace BFS4WIN
                 Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
             }
             Int64 sec = sector * bytesPerSector;
-
-            int size = int.Parse(bytesPerSector.ToString());
-            byte[] buf = new byte[size];
-           
-            
             Int64 filePos;
             if (!SetFilePointerEx(handleValue, sec, out filePos, EMoveMethod.Begin))
             {
                 Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
             }
             int write = 0;
-            WriteFile(handleValue, data, size, out write, IntPtr.Zero);
+            WriteFile(handleValue, data, data.Length, out write, IntPtr.Zero);
             handleValue.Close();
             //return buf;
         }

@@ -43,9 +43,10 @@ namespace BFS4WIN
             //create BFSTOC
             BFSTOC bfsTOC = BFSTOC.emptyToc(totalSectors, bytesPerSector, true);
             //write GPT
-            llda.WriteSector(drive, 0, 4096 * 5, gpt.ToByteArray());
+            llda.WriteSector(drive, 0, 4096, gpt.ToByteArray());
             //write MirrorGPT
-            llda.WriteSector(drive, (Int64)totalSectors - 5, 4096 * 5, gpt.ToByteArray());
+            gpt.ToggleMirror();
+            llda.WriteSector(drive, (Int64)totalSectors -40, 512, gpt.ToGPTMirrorByteArray());
             //write  BFSTOC
             llda.WriteSector(drive, 5, 4096, bfsTOC.ToByteArray());
             //write mirror BFSTOC

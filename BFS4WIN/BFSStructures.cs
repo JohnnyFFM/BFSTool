@@ -59,12 +59,38 @@ namespace BFS4WIN
             
         }
 
-
         public byte[] ToByteArray()
         {
             byte[] buff = new byte[Marshal.SizeOf(typeof(GPT))];
             GCHandle handle = GCHandle.Alloc(buff, GCHandleType.Pinned);
             Marshal.StructureToPtr(this, handle.AddrOfPinnedObject(), false);
+            handle.Free();
+            return buff;
+        }
+
+        //Convert primary GPT to backupGPT
+        public void ToggleMirror()
+        {
+            UInt64 backup;
+            backup = gptHeader.currentLba;
+            gptHeader.currentLba = gptHeader.backupLba;
+            gptHeader.backupLba = backup;
+            if (gptHeader.entriesStart == 2)
+            {
+                gptHeader.entriesStart = gptHeader.currentLba - 32;
+            }
+            else {
+                gptHeader.entriesStart = 2;
+            }
+            gptHeader.UpdateCRC32(CRC.CRC32(gptPartitionTable.ToByteArray()));
+        }
+
+        public byte[] ToGPTMirrorByteArray()
+        {
+            byte[] buff = new byte[Marshal.SizeOf(typeof(GPT))];
+            GCHandle handle = GCHandle.Alloc(buff, GCHandleType.Pinned);
+            Marshal.StructureToPtr(gptPartitionTable, handle.AddrOfPinnedObject()+3072+512, false);
+            Marshal.StructureToPtr(gptHeader, handle.AddrOfPinnedObject()+512+3072+16384, false);
             handle.Free();
             return buff;
         }
@@ -129,17 +155,16 @@ namespace BFS4WIN
 
         //Create GPT for BFS
         public GPTHeader(UInt64 totalSectors, UInt32 bytesPerSector)
-    {
-
+        {
             signature = new byte[] { 69, 70, 73, 32, 80, 65, 82, 84 };
             revision = 256*256;
             headerSize = 92;
             crc32Header = 0;
             reserved1 = 0;
             currentLba = 1;
-            backupLba = totalSectors - 5;
-            firstUsableLba = 40;
-            lastUsableLba = totalSectors -6;
+            backupLba = totalSectors - 1;
+            firstUsableLba = 5 * (4096 / bytesPerSector);
+            lastUsableLba = totalSectors -1 - 5 *(4096 / bytesPerSector);
             diskGuid = Guid.NewGuid();
             entriesStart = 2;
             entriesCount = 128;

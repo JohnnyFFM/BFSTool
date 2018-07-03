@@ -244,7 +244,7 @@ namespace BFS4WIN
             if (drivesView.SelectedItems.Count > 0)
             {
                 GPT gpt = GPT.FromSectors(llda.ReadSector(drivesView.SelectedItems[0].SubItems[1].Text, 0, 4096*5));
-                gpt.gptHeader.UpdateCRC32(CRC.CRC32(gpt.gptPartitionTable.ToByteArray()));
+               // gpt.gptHeader.UpdateCRC32(CRC.CRC32(gpt.gptPartitionTable.ToByteArray()));
 
              
 
@@ -323,5 +323,25 @@ namespace BFS4WIN
 
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (drivesView.SelectedItems.Count > 0)
+            {
+                byte[] x = new byte[512];
+                llda.WriteSector(drivesView.SelectedItems[0].SubItems[1].Text, 1, 512,x);
+
+                UInt64 totalSectors = (UInt64.Parse(drivesView.SelectedItems[0].SubItems[2].Text));
+                GPT gpt =  GPT.FromSectors(llda.ReadSector(drivesView.SelectedItems[0].SubItems[1].Text, 0, 4096 * 5));
+                GPT gpt2 = GPT.FromSectors(llda.ReadSectors(drivesView.SelectedItems[0].SubItems[1].Text, (long)totalSectors-2, 512,2));
+
+                llda.refreshDrive(drivesView.SelectedItems[0].SubItems[1].Text);
+
+                // gpt.gptHeader.UpdateCRC32(CRC.CRC32(gpt.gptPartitionTable.ToByteArray()));
+
+
+
+            }
+
+        }
     }
 }
