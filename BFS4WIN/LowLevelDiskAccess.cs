@@ -167,11 +167,12 @@ namespace BFS4WIN
             short INVALID_HANDLE_VALUE = -1;
             uint GENERIC_READ = 0x80000000;
             uint GENERIC_WRITE = 0x40000000;
+            uint FILE_FLAG_NO_BUFFERING = 0x20000000;
             uint CREATE_NEW = 1;
             uint CREATE_ALWAYS = 2;
             uint OPEN_EXISTING = 3;
 
-            iFile = CreateFile(drive, GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
+            iFile = CreateFile(drive, GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, IntPtr.Zero);
             if (iFile.IsInvalid)
             {
                 Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
@@ -187,7 +188,7 @@ namespace BFS4WIN
 
         public void Seek(Int64 position)
         {
-            Int64 filePos;
+            Int64 filePos;           
             if (!SetFilePointerEx(iFile, position, out filePos, EMoveMethod.Begin))
             {
                 Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());

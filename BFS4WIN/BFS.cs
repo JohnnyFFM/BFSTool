@@ -54,6 +54,20 @@ namespace BFS4WIN
             return result;
         }
 
+        public static void SetPos(string drive, int file_id, UInt32 pos)
+        {
+            LoadBFSTOC(drive);
+            bfsTOC.plotFiles[file_id].pos = pos;
+            SaveBFSTOC(drive);
+        }
+
+        public static void SetStatus(string drive, int file_id, UInt32 status)
+        {
+            LoadBFSTOC(drive);
+            bfsTOC.plotFiles[file_id].status = status;
+            SaveBFSTOC(drive);
+        }
+
         public static Boolean SetID(String drive, UInt64 id)
         {
             LoadBFSTOC(drive);

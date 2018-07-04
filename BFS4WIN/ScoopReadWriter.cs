@@ -26,12 +26,21 @@ namespace BFS4WIN
         public ScoopReadWriter(string stFileName)
         {
             _FileName = stFileName;
+
         }
 
         public void Close()
         {
             _bOpen = false;
-            _fs.Close();
+            if (_fs != null)
+            {
+                _fs.Close();
+            }
+            else
+            {
+                llda.Close();
+            }
+                
         }
 
         public Boolean OpenR(bool directIO)
@@ -60,6 +69,7 @@ namespace BFS4WIN
 
         public Boolean OpenW()
         {
+            llda = new LowLevelDiskAccess();
             try
             {
                 llda.OpenW(_FileName);
@@ -71,7 +81,7 @@ namespace BFS4WIN
                 return false;
             }
             _lPosition = 0;
-            _lLength = _fs.Length;
+            //_lLength = _fs.Length;
             _bOpen = true;
             return true;
         }

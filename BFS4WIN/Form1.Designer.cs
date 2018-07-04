@@ -60,7 +60,10 @@
             this.label9 = new System.Windows.Forms.Label();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.memLimit = new System.Windows.Forms.NumericUpDown();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.statusStrip = new System.Windows.Forms.StatusStrip();
+            this.tbl_x = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tbl_progress = new System.Windows.Forms.ToolStripProgressBar();
+            this.tbl_status = new System.Windows.Forms.ToolStripStatusLabel();
             this.label8 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.capacity = new System.Windows.Forms.ProgressBar();
@@ -68,6 +71,7 @@
             this.btn_optimize = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.memLimit)).BeginInit();
+            this.statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // drivesView
@@ -337,14 +341,40 @@
             0,
             0});
             // 
-            // statusStrip1
+            // statusStrip
             // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 514);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(820, 22);
-            this.statusStrip1.SizingGrip = false;
-            this.statusStrip1.TabIndex = 30;
-            this.statusStrip1.Text = "statusStrip1";
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tbl_x,
+            this.tbl_progress,
+            this.tbl_status});
+            this.statusStrip.Location = new System.Drawing.Point(0, 514);
+            this.statusStrip.Name = "statusStrip";
+            this.statusStrip.Size = new System.Drawing.Size(820, 22);
+            this.statusStrip.SizingGrip = false;
+            this.statusStrip.TabIndex = 30;
+            this.statusStrip.Text = "statusStrip1";
+            // 
+            // tbl_x
+            // 
+            this.tbl_x.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
+            this.tbl_x.ForeColor = System.Drawing.Color.Red;
+            this.tbl_x.Name = "tbl_x";
+            this.tbl_x.Size = new System.Drawing.Size(14, 17);
+            this.tbl_x.Text = "X";
+            this.tbl_x.Visible = false;
+            // 
+            // tbl_progress
+            // 
+            this.tbl_progress.Name = "tbl_progress";
+            this.tbl_progress.Size = new System.Drawing.Size(150, 16);
+            this.tbl_progress.Visible = false;
+            // 
+            // tbl_status
+            // 
+            this.tbl_status.Name = "tbl_status";
+            this.tbl_status.Size = new System.Drawing.Size(439, 17);
+            this.tbl_status.Text = "Completed: 0% Elapsed: 00:00:00 Remaining: 00:00:00 Speed: 0 nonces/m (0 MB/s)";
+            this.tbl_status.Visible = false;
             // 
             // label8
             // 
@@ -412,7 +442,7 @@
             this.Controls.Add(this.capacity);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label8);
-            this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.memLimit);
             this.Controls.Add(this.tb_id);
             this.Controls.Add(this.label9);
@@ -438,6 +468,8 @@
             this.Text = "Johnny\'s BFSTool v.0.1";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.memLimit)).EndInit();
+            this.statusStrip.ResumeLayout(false);
+            this.statusStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -476,13 +508,16 @@
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.NumericUpDown memLimit;
         private System.Windows.Forms.ColumnHeader columnHeader8;
-        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.ProgressBar capacity;
         private System.Windows.Forms.Button btn_plot;
         private System.Windows.Forms.Button btn_optimize;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.ToolStripProgressBar tbl_progress;
+        private System.Windows.Forms.ToolStripStatusLabel tbl_status;
+        private System.Windows.Forms.ToolStripStatusLabel tbl_x;
     }
 }
 

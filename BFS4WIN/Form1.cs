@@ -16,8 +16,8 @@ namespace BFS4WIN
     {
         LowLevelDiskAccess llda;
         static AutoResetEvent[] autoEvents;
-        UInt64 startOffset;
-        UInt64 scoopOffset;
+        static UInt64 startOffset;
+        static UInt64 scoopOffset;
         static Boolean halt1 = false;
         static Boolean halt2 = false;
 
@@ -122,13 +122,17 @@ namespace BFS4WIN
         }
 
         //Task description for dual-threadding
-        struct TaskInfo
+        public struct TaskInfo
         {
             public ScoopReadWriter reader;
             public ScoopReadWriter writer;
+            public string drive;
+            public int file;
             public int y;
             public int z;
             public int x;
+            public UInt64 scoopoffset;
+            public UInt64 startoffset;
             public int limit;
             public PlotFile src;
             public BFSPlotFile tar;
@@ -147,7 +151,7 @@ namespace BFS4WIN
             Boolean shuffle = false;
             PlotFile temp;
             //Let user select plotfile
-            string filter = "PoC2 plot files | " + tb_id.Text + "_ * _ *.*| PoC1 plot files| " + tb_id.Text + "_ * _ * _ *.*";
+            string filter = "PoC2 plot files | " + tb_id.Text + "_*_*.*| PoC1 plot files|" + tb_id.Text + "_*_*_*.*";
             openFileDialog.Filter = filter;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -183,7 +187,7 @@ namespace BFS4WIN
 
             ScoopReadWriter writer; 
             writer = new ScoopReadWriter(drive);
-            reader.OpenW();
+            writer.OpenW();
 
             //Allocate memory
             int limit = Convert.ToInt32(memLimit.Value) * 4096;
@@ -192,11 +196,7 @@ namespace BFS4WIN
             Scoop scoop3 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop
             Scoop scoop4 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop      
 
-            //initialise stats
-            DateTime start = DateTime.Now;
-            TimeSpan elapsed;
-            TimeSpan togo;
-
+  
             //create masterplan     
             int loops = (int)Math.Ceiling((double)(temp.nonces) / limit);
             TaskInfo[] masterplan = new TaskInfo[2048 * loops];
@@ -210,6 +210,8 @@ namespace BFS4WIN
                     masterplan[y * loops + zz] = new TaskInfo();
                     masterplan[y * loops + zz].reader = reader;
                     masterplan[y * loops + zz].writer = writer;
+                    masterplan[y * loops + zz].file = file;
+                    masterplan[y * loops + zz].drive = drive;
                     masterplan[y * loops + zz].y = y;
                     masterplan[y * loops + zz].z = z;
                     masterplan[y * loops + zz].x = y * loops + zz;
@@ -226,24 +228,45 @@ namespace BFS4WIN
                 }
             }
 
+            //enable stats
+            tbl_x.Visible = true;
+            tbl_status.Visible = true;
+            tbl_progress.Visible = true;
+            tbl_progress.Maximum = 2048;
+            var task1 = Task.Factory.StartNew(() => Th_copy(masterplan));
 
-            //execute taskplan
+        }
+
+        public void Th_copy(TaskInfo[] masterplan)
+        {
+
+            //execute taskplan in separate thread
+
+            //initialise stats
+            DateTime start = DateTime.Now;
+            TimeSpan elapsed;
+            TimeSpan togo;
 
             //perform first read
             Th_read(masterplan[0]);
 
             autoEvents = new AutoResetEvent[]
-            {
+                {
                 new AutoResetEvent(false),
                 new AutoResetEvent(false)
-            };
+                };
 
             //perform reads and writes parallel
             for (long x = 1; x < masterplan.LongLength; x++)
             {
-                ThreadPool.QueueUserWorkItem(new WaitCallback(Th_write), masterplan[x - 1]);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(Th_read), masterplan[x]);
-                WaitHandle.WaitAll(autoEvents);
+                // ThreadPool.QueueUserWorkItem(new WaitCallback(Th_write), masterplan[x - 1]);
+                //ThreadPool.QueueUserWorkItem(new WaitCallback(Th_read), masterplan[x]);
+                //WaitHandle.WaitAll(autoEvents);
+
+                var task1 = Task.Factory.StartNew(() => Th_write(masterplan[x - 1]));
+                var task2 = Task.Factory.StartNew(() => Th_read(masterplan[x]));
+                Task.WaitAll(task1, task2);
+
                 if (halt1 || halt2)
                 {
                     Console.Error.WriteLine("ERR: Shutting down!");
@@ -254,10 +277,11 @@ namespace BFS4WIN
                 elapsed = DateTime.Now.Subtract(start);
                 togo = TimeSpan.FromTicks(elapsed.Ticks / (masterplan[x].y + 1) * (2048 - masterplan[x].y - 1));
                 string completed = Math.Round((double)(masterplan[x].y + 1) / 2048 * 100).ToString() + "%";
-                string speed1 = Math.Round((double)src.nonces / 4096 * 2 * (masterplan[x].y + 1) * 60 / (elapsed.TotalSeconds + 1)).ToString() + " nonces/m ";
-                string speed2 = "(" + (Math.Round((double)src.nonces / (2 << 12) * (masterplan[x].y + 1) / (elapsed.TotalSeconds + 1))).ToString() + "MB/s)";
-                string speed = speed1 + speed2;
-                Console.Write("Completed: " + completed + ", Elapsed: " + TimeSpanToString(elapsed) + ", Remaining: " + TimeSpanToString(togo) + ", Speed: " + speed + "          \r");
+                string speed1 = Math.Round((double)masterplan[x].src.nonces / 4096 * 2 * (masterplan[x].y + 1) * 60 / (elapsed.TotalSeconds + 1)).ToString() + " nonces/m ";
+                string speed2 = "(" + (Math.Round((double)masterplan[x].src.nonces / (2 << 12) * (masterplan[x].y + 1) / (elapsed.TotalSeconds + 1))).ToString() + "MB/s)";
+                string speed = speed1 + speed2; lock (statusStrip)
+                setStatus(masterplan[x].y + 1, "Completed: " + completed + ", Elapsed: " + TimeSpanToString(elapsed) + ", Remaining: " + TimeSpanToString(togo) + ", Speed: " + speed);
+                BFS.SetPos(masterplan[x].drive, masterplan[x].file, (UInt32)masterplan[x].y);
             }
             //perform last write
             if (!halt1 && !halt2) Th_write(masterplan[masterplan.LongLength - 1]);
@@ -267,14 +291,27 @@ namespace BFS4WIN
                 return;
             }
 
-            //mark progress resume
-
             //mark as finished
+            setStatus(masterplan[masterplan.LongLength - 1].y + 1, "Completed.");
+            BFS.SetPos(masterplan[masterplan.LongLength - 1].drive, masterplan[masterplan.LongLength - 1].file, (UInt32)masterplan[masterplan.LongLength - 1].y);
+            BFS.SetStatus(masterplan[masterplan.LongLength - 1].drive, masterplan[masterplan.LongLength - 1].file, 1);
 
             // close reader/writer
-            reader.Close();
-            writer.Close();
+            masterplan[0].reader.Close();
+            masterplan[0].writer.Close();
+        }
 
+        private void setStatus(int progress, string text)
+        {
+            if (statusStrip.InvokeRequired)
+            {
+                statusStrip.Invoke(new MethodInvoker(() => { setStatus(progress, text); }));
+            }
+            else
+            {
+                tbl_progress.Value = progress;
+                tbl_status.Text = text;
+            }
         }
 
         public static void Th_read(object stateInfo)
@@ -284,15 +321,15 @@ namespace BFS4WIN
             //determine cache cycle and front scoop back scoop cycle to alternate
             if (ti.x % 2 == 0)
             {
-                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(ti.y, ti.src.nonces, ti.z, ti.scoop1, Math.Min(ti.src.nonces - ti.z, ti.limit));
-                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(4095 - ti.y, ti.src.nonces, ti.z, ti.scoop2, Math.Min(ti.src.nonces - ti.z, ti.limit));
-                if (ti.shuffle) Poc1poc2shuffle(ti.scoop1, ti.scoop2, Math.Min(ti.src.nonces - ti.z, ti.limit));
+                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(ti.y, ti.src.nonces, ti.z, ti.scoop1, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
+                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(4095 - ti.y, ti.src.nonces, ti.z, ti.scoop2, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
+                if (ti.shuffle) Poc1poc2shuffle(ti.scoop1, ti.scoop2, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
             }
             else
             {
-                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(4095 - ti.y, ti.src.nonces, ti.z, ti.scoop4, Math.Min(ti.src.nonces - ti.z, ti.limit));
-                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(ti.y, ti.src.nonces, ti.z, ti.scoop3, Math.Min(ti.src.nonces - ti.z, ti.limit));
-                if (ti.shuffle) Poc1poc2shuffle(ti.scoop3, ti.scoop4, Math.Min(ti.src.nonces - ti.z, ti.limit));
+                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(4095 - ti.y, ti.src.nonces, ti.z, ti.scoop4, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
+                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(ti.y, ti.src.nonces, ti.z, ti.scoop3, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
+                if (ti.shuffle) Poc1poc2shuffle(ti.scoop3, ti.scoop4, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
             }
             if (ti.x != 0) autoEvents[0].Set();
         }
@@ -302,13 +339,13 @@ namespace BFS4WIN
             TaskInfo ti = (TaskInfo)stateInfo;
             if (ti.x % 2 == 0)
             {
-                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, ti.tar.nonces, ti.z + (long)(ti.src.start - ti.tar.start), ti.scoop1, Math.Min(ti.src.nonces - ti.z, ti.limit));
-                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, ti.tar.nonces, ti.z + (long)(ti.src.start - ti.tar.start), ti.scoop2, Math.Min(ti.src.nonces - ti.z, ti.limit));
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, (Int64)scoopOffset*64,(Int64)startOffset*64, ti.scoop1, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop2, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
             }
             else
             {
-                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, ti.tar.nonces, ti.z + (long)(ti.src.start - ti.tar.start), ti.scoop4, Math.Min(ti.src.nonces - ti.z, ti.limit));
-                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, ti.tar.nonces, ti.z + (long)(ti.src.start - ti.tar.start), ti.scoop3, Math.Min(ti.src.nonces - ti.z, ti.limit));
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop4, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop3, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
             }
             if (ti.x != (ti.end - 1))
             {
