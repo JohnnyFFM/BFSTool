@@ -323,11 +323,13 @@ namespace BFS4WIN
             {
                 tbl_progress.Value = progress;
                 tbl_status.Text = text;
+                Application.DoEvents();
             }
         }
 
         public static void Th_read(object stateInfo)
         {
+
             TaskInfo ti = (TaskInfo)stateInfo;
 
             //determine cache cycle and front scoop back scoop cycle to alternate
@@ -343,12 +345,12 @@ namespace BFS4WIN
                 if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(ti.y, ti.src.nonces, ti.z, ti.scoop3, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
                 if (ti.shuffle) Poc1poc2shuffle(ti.scoop3, ti.scoop4, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
             }
-            if (ti.x != 0) autoEvents[0].Set();
+
         }
 
         public static void Th_write(object stateInfo)
         {
-            return;
+
             TaskInfo ti = (TaskInfo)stateInfo;
             if (ti.x % 2 == 0)
             {
@@ -360,10 +362,7 @@ namespace BFS4WIN
                 if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop4, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
                 if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop3, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
             }
-            if (ti.x != (ti.end - 1))
-            {
-                autoEvents[1].Set();
-            }
+  
         }
 
         //Pretty Print Timespan

@@ -327,7 +327,7 @@
             0,
             0});
             this.memLimit.Minimum = new decimal(new int[] {
-            128,
+            1,
             0,
             0,
             0});

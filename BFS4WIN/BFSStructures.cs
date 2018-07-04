@@ -369,7 +369,7 @@ namespace BFS4WIN
             }
             else
             {
-                newStartPos = plotFiles[position - 1].startPos + plotFiles[position - 1].nonces * 64;
+                newStartPos = plotFiles[position - 1].startPos + plotFiles[position - 1].nonces / 64;
                 freespace = diskspace - newStartPos + 6;
             }
             if (nonces * 64 > freespace) return -1;
