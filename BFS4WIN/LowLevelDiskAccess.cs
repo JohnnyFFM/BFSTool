@@ -24,6 +24,9 @@ namespace BFS4WIN
             End = 2
         }
 
+        [DllImport("kernel32", SetLastError = true)]
+        private static extern bool FlushFileBuffers(SafeFileHandle handle);
+
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern Boolean SetFilePointerEx(
             [In] SafeFileHandle hFile,
@@ -172,7 +175,7 @@ namespace BFS4WIN
             uint CREATE_ALWAYS = 2;
             uint OPEN_EXISTING = 3;
 
-            iFile = CreateFile(drive, GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, IntPtr.Zero);
+            iFile = CreateFile(drive, GENERIC_WRITE, 0, IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
             if (iFile.IsInvalid)
             {
                 Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
@@ -182,6 +185,7 @@ namespace BFS4WIN
 
         public void Close()
         {
+            FlushFileBuffers(iFile);
             iFile.Close();
         }
 

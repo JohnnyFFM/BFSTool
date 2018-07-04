@@ -126,7 +126,7 @@ namespace BFS4WIN
         {
             public ScoopReadWriter reader;
             public ScoopReadWriter writer;
-            public string drive;
+            public String drive;
             public int file;
             public int y;
             public int z;
@@ -148,6 +148,8 @@ namespace BFS4WIN
         private void btn_upload_Click(object sender, EventArgs e)
         {
             String drive = drivesView.SelectedItems[0].SubItems[1].Text;
+            halt1 = false;
+            halt2 = false;
             Boolean shuffle = false;
             PlotFile temp;
             //Let user select plotfile
@@ -174,6 +176,14 @@ namespace BFS4WIN
 
             //Create file in bfsTOC
             int file = BFS.AddPlotFile(drive, temp.startNonce,temp.nonces/64*64,2,0);
+            if (file > -1)
+            {
+                FillBFSView(drive);
+            }
+            else
+            {
+                return;
+            }
 
             //Get offsets
             startOffset = BFS.bfsTOC.plotFiles[file].startPos;
@@ -210,8 +220,8 @@ namespace BFS4WIN
                     masterplan[y * loops + zz] = new TaskInfo();
                     masterplan[y * loops + zz].reader = reader;
                     masterplan[y * loops + zz].writer = writer;
-                    masterplan[y * loops + zz].file = file;
                     masterplan[y * loops + zz].drive = drive;
+                    masterplan[y * loops + zz].file = file;
                     masterplan[y * loops + zz].y = y;
                     masterplan[y * loops + zz].z = z;
                     masterplan[y * loops + zz].x = y * loops + zz;
@@ -257,7 +267,8 @@ namespace BFS4WIN
                 };
 
             //perform reads and writes parallel
-            for (long x = 1; x < masterplan.LongLength; x++)
+            long x;
+            for (x = 1; x < masterplan.LongLength; x++)
             {
                 // ThreadPool.QueueUserWorkItem(new WaitCallback(Th_write), masterplan[x - 1]);
                 //ThreadPool.QueueUserWorkItem(new WaitCallback(Th_read), masterplan[x]);
@@ -269,8 +280,7 @@ namespace BFS4WIN
 
                 if (halt1 || halt2)
                 {
-                    Console.Error.WriteLine("ERR: Shutting down!");
-                    return;
+                    break;
                 }
 
                 //update status
@@ -281,24 +291,26 @@ namespace BFS4WIN
                 string speed2 = "(" + (Math.Round((double)masterplan[x].src.nonces / (2 << 12) * (masterplan[x].y + 1) / (elapsed.TotalSeconds + 1))).ToString() + "MB/s)";
                 string speed = speed1 + speed2; lock (statusStrip)
                 setStatus(masterplan[x].y + 1, "Completed: " + completed + ", Elapsed: " + TimeSpanToString(elapsed) + ", Remaining: " + TimeSpanToString(togo) + ", Speed: " + speed);
-                BFS.SetPos(masterplan[x].drive, masterplan[x].file, (UInt32)masterplan[x].y);
+
             }
             //perform last write
             if (!halt1 && !halt2) Th_write(masterplan[masterplan.LongLength - 1]);
-            if (halt1 || halt2)
-            {
-                Console.Error.WriteLine("ERR: Shutting down!");
-                return;
-            }
-
-            //mark as finished
-            setStatus(masterplan[masterplan.LongLength - 1].y + 1, "Completed.");
-            BFS.SetPos(masterplan[masterplan.LongLength - 1].drive, masterplan[masterplan.LongLength - 1].file, (UInt32)masterplan[masterplan.LongLength - 1].y);
-            BFS.SetStatus(masterplan[masterplan.LongLength - 1].drive, masterplan[masterplan.LongLength - 1].file, 1);
-
             // close reader/writer
             masterplan[0].reader.Close();
             masterplan[0].writer.Close();
+
+
+            if (halt1 || halt2)
+            {
+                setStatus(masterplan[x].y + 1, "Abort.");
+            }
+
+
+            //mark as finished
+            if (!halt1 && !halt2) BFS.SetStatus(masterplan[masterplan.LongLength - 1].drive, masterplan[masterplan.LongLength - 1].file, 1);
+            if (halt1 || halt2) BFS.SetPos(masterplan[masterplan.LongLength - 1].drive, masterplan[masterplan.LongLength - 1].file, (uint)x);
+            if (!halt1 && !halt2) setStatus(masterplan[masterplan.LongLength - 1].y + 1, "Completed.");
+
         }
 
         private void setStatus(int progress, string text)
@@ -336,6 +348,7 @@ namespace BFS4WIN
 
         public static void Th_write(object stateInfo)
         {
+            return;
             TaskInfo ti = (TaskInfo)stateInfo;
             if (ti.x % 2 == 0)
             {
@@ -544,6 +557,27 @@ namespace BFS4WIN
         }
 
         private void btn_plot_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tbl_x_Click(object sender, EventArgs e)
+        {
+            if (tbl_x.Visible)halt1 = true;
+        }
+
+        private void tbl_status_TextChanged(object sender, EventArgs e)
+        {
+            String drive = drivesView.SelectedItems[0].SubItems[1].Text;
+            if (tbl_status.Text == "Completed.")
+            {
+                tbl_progress.Visible = false;
+                tbl_x.Visible = false;
+                FillBFSView(drive);
+            }
+        }
+
+        private void tbl_status_Click(object sender, EventArgs e)
         {
 
         }

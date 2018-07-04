@@ -15,6 +15,7 @@ namespace BFS4WIN
         private static LowLevelDiskAccess llda;
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool SetFileValidData(SafeFileHandle hFile, long ValidDataLength);
+
         protected string _FileName;
         private long _lLength = -1;
         protected bool _bOpen = false;

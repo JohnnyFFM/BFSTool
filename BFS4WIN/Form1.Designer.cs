@@ -285,7 +285,7 @@
             // lbl_capa
             // 
             this.lbl_capa.AutoSize = true;
-            this.lbl_capa.Location = new System.Drawing.Point(667, 441);
+            this.lbl_capa.Location = new System.Drawing.Point(648, 440);
             this.lbl_capa.Name = "lbl_capa";
             this.lbl_capa.Size = new System.Drawing.Size(119, 13);
             this.lbl_capa.TabIndex = 22;
@@ -362,6 +362,7 @@
             this.tbl_x.Size = new System.Drawing.Size(14, 17);
             this.tbl_x.Text = "X";
             this.tbl_x.Visible = false;
+            this.tbl_x.Click += new System.EventHandler(this.tbl_x_Click);
             // 
             // tbl_progress
             // 
@@ -375,6 +376,8 @@
             this.tbl_status.Size = new System.Drawing.Size(439, 17);
             this.tbl_status.Text = "Completed: 0% Elapsed: 00:00:00 Remaining: 00:00:00 Speed: 0 nonces/m (0 MB/s)";
             this.tbl_status.Visible = false;
+            this.tbl_status.Click += new System.EventHandler(this.tbl_status_Click);
+            this.tbl_status.TextChanged += new System.EventHandler(this.tbl_status_TextChanged);
             // 
             // label8
             // 
@@ -398,7 +401,7 @@
             // 
             this.capacity.Location = new System.Drawing.Point(472, 439);
             this.capacity.Name = "capacity";
-            this.capacity.Size = new System.Drawing.Size(189, 16);
+            this.capacity.Size = new System.Drawing.Size(170, 16);
             this.capacity.TabIndex = 34;
             // 
             // btn_plot
