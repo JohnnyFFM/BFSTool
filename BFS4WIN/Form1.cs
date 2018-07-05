@@ -145,6 +145,8 @@ namespace BFS4WIN
             public Scoop scoop4;
             public bool shuffle;
             public long end;
+            public int startOffset64;
+            public int endOffset64;
         }
 
         //upload a file to a BFS formatted drive
@@ -178,8 +180,18 @@ namespace BFS4WIN
             //check ID
             if (temp.id.ToString() != tb_id.Text) return;
 
+            //calc startoffset and endoffset for 64 nonces alignment
+            UInt32 endOffset64 = temp.nonces - temp.nonces / 64 * 64;
+            UInt64 startNonceR = temp.startNonce / 64 * 64;
+            UInt64 startOffset64 = startNonceR < temp.startNonce ? startNonceR + 64 - temp.startNonce : 0;
+
+            //check last file and offer to insert dummy file
+            //Todo
+
+
+
             //Create file in bfsTOC
-            int file = BFS.AddPlotFile(drive, temp.startNonce,temp.nonces/64*64,2,0);
+            int file = BFS.AddPlotFile(drive, temp.startNonce+startOffset64,temp.nonces-endOffset64,2,0);
             if (file > -1)
             {
                 FillBFSView(drive);
@@ -238,6 +250,9 @@ namespace BFS4WIN
                     masterplan[y * loops + zz].scoop4 = scoop4;
                     masterplan[y * loops + zz].shuffle = shuffle;
                     masterplan[y * loops + zz].end = masterplan.LongLength;
+                    masterplan[y * loops + zz].startOffset64 = (int)startOffset64;
+                    masterplan[y * loops + zz].endOffset64 = (int)endOffset64;
+
                     zz += 1;
                 }
             }
