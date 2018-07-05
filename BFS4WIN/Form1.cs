@@ -48,7 +48,10 @@ namespace BFS4WIN
                 item.SubItems.Add(x);
                 Int64 sectors = llda.GetSectors(x)/512;
                 item.SubItems.Add(sectors.ToString());
-                item.SubItems.Add(llda.BytesPerSector(i).ToString());
+                UInt32 sectorsL = llda.BytesPerSector(i);
+                item.SubItems.Add(sectorsL.ToString());
+                UInt32 sectorsP = llda.GetPhysicalSectors(x);
+                item.SubItems.Add(sectorsP > 0 ?  sectorsP.ToString():sectorsL.ToString());
                 item.SubItems.Add(llda.GetCaption(i));
                 item.SubItems.Add(((decimal)sectors * llda.BytesPerSector(i) / 1024/1024/1024).ToString("0.00")+" GiB");
                 item.SubItems.Add((((long)(sectors-12*8) * llda.BytesPerSector(i) / 4096 / 64 /64)*64).ToString());
@@ -148,6 +151,7 @@ namespace BFS4WIN
         private void btn_upload_Click(object sender, EventArgs e)
         {
             String drive = drivesView.SelectedItems[0].SubItems[1].Text;
+            Int32 PbytesPerSector = (Int32.Parse(drivesView.SelectedItems[0].SubItems[4].Text));
             halt1 = false;
             halt2 = false;
             Boolean shuffle = false;
@@ -200,7 +204,7 @@ namespace BFS4WIN
             writer.OpenW();
 
             //Allocate memory
-            int limit = Convert.ToInt32(memLimit.Value) * 4096;
+            int limit = Convert.ToInt32(PbytesPerSector) * 4096/1024; //Write cache, 1MB for 4k drives
             Scoop scoop1 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop
             Scoop scoop2 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop
             Scoop scoop3 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop
@@ -430,7 +434,7 @@ namespace BFS4WIN
         {
             if (drivesView.SelectedItems.Count > 0)
             {
-                if (drivesView.SelectedItems[0].SubItems[7].Text == "Yes")
+                if (drivesView.SelectedItems[0].SubItems[8].Text == "Yes")
                 {
                     FillBFSView(drivesView.SelectedItems[0].SubItems[1].Text);
                 }
@@ -574,11 +578,6 @@ namespace BFS4WIN
                 tbl_x.Visible = false;
                 FillBFSView(drive);
             }
-        }
-
-        private void tbl_status_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }

@@ -58,6 +58,66 @@ namespace BFS4WIN
         [return: MarshalAsAttribute(UnmanagedType.Bool)]
         public static extern Boolean DeviceIoControl(SafeFileHandle hDevice, Int32 dwIoControlCode, IntPtr lpInBuffer, int nInBufferSize, IntPtr lpOutBuffer, Int32 nOutBufferSize, ref Int32 lpBytesReturned, IntPtr lpOverlapped);
 
+        [DllImportAttribute("kernel32.dll", EntryPoint = "DeviceIoControl", SetLastError = true)]
+        [return: MarshalAsAttribute(UnmanagedType.Bool)]
+        public static extern Boolean DeviceIoControl(
+         SafeFileHandle hDevice,
+         uint dwIoControlCode,
+         ref STORAGE_PROPERTY_QUERY InBuffer,
+         int nInBufferSize,
+         ref STORAGE_ACCESS_ALIGNMENT_DESCRIPTOR OutBuffer,
+         int nOutBufferSize,
+         ref int pBytesReturned,
+         IntPtr lpOverlapped);
+
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct STORAGE_ACCESS_ALIGNMENT_DESCRIPTOR
+        {
+            public UInt32 Version;
+            public UInt32 Size;
+            public UInt32 BytesPerCacheLine;
+            public UInt32 BytesOffsetForCacheAlignment;
+            public UInt32 BytesPerLogicalSector;
+            public UInt32 BytesPerPhysicalSector;
+            public UInt32 BytesOffsetForSectorAlignment;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct STORAGE_PROPERTY_QUERY
+        {
+            public enum STORAGE_PROPERTY_ID : int
+            {
+                StorageDeviceProperty = 0,
+                StorageAdapterProperty = 1,
+                StorageDeviceIdProperty = 2,
+                StorageDeviceUniqueIdProperty = 3,
+                StorageDeviceWriteCacheProperty = 4,
+                StorageMiniportProperty = 5,
+                StorageAccessAlignmentProperty = 6,
+                StorageDeviceSeekPenaltyProperty = 7,
+                StorageDeviceTrimProperty = 8,
+                StorageDeviceWriteAggregationProperty = 9,
+                StorageDeviceDeviceTelemetryProperty = 0xA,
+                StorageDeviceLBProvisioningProperty = 0xB,
+                StorageDeviceZeroPowerProperty = 0xC,
+                StorageDeviceCopyOffloadProperty = 0xD,
+                StorageDeviceResiliencyProperty = 0xE,
+            }
+            
+            public enum STORAGE_QUERY_TYPE : int
+            {
+                PropertyStandardQuery = 0,
+                PropertyExistsQuery = 1,
+                PropertyMaskQuery = 2,
+                PropertyQueryMaxDefined = 3,
+            }
+
+            public STORAGE_PROPERTY_ID PropertyId;
+            public STORAGE_QUERY_TYPE QueryType;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]
+            public Byte[] AdditionalParameters;
+        }
         #endregion
 
         public Boolean refreshDrive(string drive)
@@ -120,6 +180,44 @@ namespace BFS4WIN
                 return 0;
             }
         }
+
+        public UInt32 GetPhysicalSectors(string drive)
+        {
+            short FILE_ATTRIBUTE_NORMAL = 0x80;
+            short INVALID_HANDLE_VALUE = -1;
+            uint GENERIC_READ = 0x80000000;
+            uint GENERIC_WRITE = 0x40000000;
+            uint CREATE_NEW = 1;
+            uint CREATE_ALWAYS = 2;
+            uint OPEN_EXISTING = 3;
+
+            SafeFileHandle handleValue = CreateFile(drive, GENERIC_READ, 0, IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
+            if (handleValue.IsInvalid)
+            {
+                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+            }
+            uint IOCTL_STORAGE_QUERY_PROPERTY = 0x002d1400;
+            STORAGE_PROPERTY_QUERY storageQuery = new STORAGE_PROPERTY_QUERY();
+            storageQuery.PropertyId = STORAGE_PROPERTY_QUERY.STORAGE_PROPERTY_ID.StorageAccessAlignmentProperty;
+            storageQuery.QueryType = STORAGE_PROPERTY_QUERY.STORAGE_QUERY_TYPE.PropertyStandardQuery;
+            STORAGE_ACCESS_ALIGNMENT_DESCRIPTOR diskAlignment = new STORAGE_ACCESS_ALIGNMENT_DESCRIPTOR();
+
+            Int32 read = 0;
+            if (DeviceIoControl(handleValue, IOCTL_STORAGE_QUERY_PROPERTY, ref storageQuery, Marshal.SizeOf(storageQuery), ref diskAlignment, Marshal.SizeOf(diskAlignment), ref read, IntPtr.Zero))
+            {
+                handleValue.Close();
+                return diskAlignment.BytesPerPhysicalSector;
+                
+            }
+            else
+            {
+                handleValue.Close();
+                return 0;
+                
+            }
+        }
+
+
         /// <summary> 
         /// Returns the Sector from the drive at the specified location 
         /// </summary> 

@@ -38,16 +38,17 @@
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label1 = new System.Windows.Forms.Label();
             this.btn_queryDrives = new System.Windows.Forms.Button();
             this.btn_format = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.bfsView = new System.Windows.Forms.ListView();
-            this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader11 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader12 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader13 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader14 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btn_upload = new System.Windows.Forms.Button();
             this.btn_deleteFile = new System.Windows.Forms.Button();
             this.btn_download = new System.Windows.Forms.Button();
@@ -59,18 +60,14 @@
             this.tb_id = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.memLimit = new System.Windows.Forms.NumericUpDown();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.tbl_x = new System.Windows.Forms.ToolStripStatusLabel();
             this.tbl_progress = new System.Windows.Forms.ToolStripProgressBar();
             this.tbl_status = new System.Windows.Forms.ToolStripStatusLabel();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
             this.capacity = new System.Windows.Forms.ProgressBar();
             this.btn_plot = new System.Windows.Forms.Button();
             this.btn_optimize = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.memLimit)).BeginInit();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -84,13 +81,14 @@
             this.columnHeader5,
             this.columnHeader6,
             this.columnHeader7,
-            this.columnHeader8});
+            this.columnHeader8,
+            this.columnHeader9});
             this.drivesView.FullRowSelect = true;
             this.drivesView.HideSelection = false;
             this.drivesView.Location = new System.Drawing.Point(12, 33);
             this.drivesView.MultiSelect = false;
             this.drivesView.Name = "drivesView";
-            this.drivesView.Size = new System.Drawing.Size(796, 171);
+            this.drivesView.Size = new System.Drawing.Size(846, 171);
             this.drivesView.TabIndex = 0;
             this.drivesView.UseCompatibleStateImageBehavior = false;
             this.drivesView.View = System.Windows.Forms.View.Details;
@@ -108,33 +106,37 @@
             // 
             // columnHeader3
             // 
-            this.columnHeader3.Text = "Total Sectors";
-            this.columnHeader3.Width = 78;
+            this.columnHeader3.Text = "Total Sectors (L)";
+            this.columnHeader3.Width = 92;
             // 
             // columnHeader4
             // 
-            this.columnHeader4.Text = "Sector Size";
-            this.columnHeader4.Width = 77;
+            this.columnHeader4.Text = "Size (L)";
+            this.columnHeader4.Width = 61;
             // 
             // columnHeader5
             // 
-            this.columnHeader5.Text = "Caption";
-            this.columnHeader5.Width = 229;
+            this.columnHeader5.Text = "Size (P)";
             // 
             // columnHeader6
             // 
-            this.columnHeader6.Text = "Capacity [GiB]";
-            this.columnHeader6.Width = 82;
+            this.columnHeader6.Text = "Caption";
+            this.columnHeader6.Width = 214;
             // 
             // columnHeader7
             // 
-            this.columnHeader7.Text = "Capacity [Nonces]";
-            this.columnHeader7.Width = 120;
+            this.columnHeader7.Text = "Capacity [GiB]";
+            this.columnHeader7.Width = 82;
             // 
             // columnHeader8
             // 
-            this.columnHeader8.Text = "BFS";
-            this.columnHeader8.Width = 59;
+            this.columnHeader8.Text = "Capacity [Nonces]";
+            this.columnHeader8.Width = 114;
+            // 
+            // columnHeader9
+            // 
+            this.columnHeader9.Text = "BFS";
+            this.columnHeader9.Width = 57;
             // 
             // label1
             // 
@@ -177,43 +179,43 @@
             // bfsView
             // 
             this.bfsView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader9,
             this.columnHeader10,
             this.columnHeader11,
             this.columnHeader12,
-            this.columnHeader13});
+            this.columnHeader13,
+            this.columnHeader14});
             this.bfsView.FullRowSelect = true;
             this.bfsView.HideSelection = false;
             this.bfsView.Location = new System.Drawing.Point(12, 275);
             this.bfsView.Name = "bfsView";
-            this.bfsView.Size = new System.Drawing.Size(796, 149);
+            this.bfsView.Size = new System.Drawing.Size(846, 149);
             this.bfsView.TabIndex = 6;
             this.bfsView.UseCompatibleStateImageBehavior = false;
             this.bfsView.View = System.Windows.Forms.View.Details;
             // 
-            // columnHeader9
-            // 
-            this.columnHeader9.Text = "ID";
-            // 
             // columnHeader10
             // 
-            this.columnHeader10.Text = "StartNonce";
-            this.columnHeader10.Width = 94;
+            this.columnHeader10.Text = "ID";
             // 
             // columnHeader11
             // 
-            this.columnHeader11.Text = "#Nonces";
-            this.columnHeader11.Width = 99;
+            this.columnHeader11.Text = "StartNonce";
+            this.columnHeader11.Width = 94;
             // 
             // columnHeader12
             // 
-            this.columnHeader12.Text = "StartSector";
-            this.columnHeader12.Width = 96;
+            this.columnHeader12.Text = "#Nonces";
+            this.columnHeader12.Width = 99;
             // 
             // columnHeader13
             // 
-            this.columnHeader13.Text = "Status";
-            this.columnHeader13.Width = 222;
+            this.columnHeader13.Text = "StartSector 4k";
+            this.columnHeader13.Width = 96;
+            // 
+            // columnHeader14
+            // 
+            this.columnHeader14.Text = "Status";
+            this.columnHeader14.Width = 222;
             // 
             // btn_upload
             // 
@@ -285,7 +287,7 @@
             // lbl_capa
             // 
             this.lbl_capa.AutoSize = true;
-            this.lbl_capa.Location = new System.Drawing.Point(648, 440);
+            this.lbl_capa.Location = new System.Drawing.Point(668, 440);
             this.lbl_capa.Name = "lbl_capa";
             this.lbl_capa.Size = new System.Drawing.Size(119, 13);
             this.lbl_capa.TabIndex = 22;
@@ -313,34 +315,6 @@
             // 
             this.openFileDialog.Filter = "PoC2 plot files|*_*_*.*|PoC1 plot files|*_*_*_*.*";
             // 
-            // memLimit
-            // 
-            this.memLimit.Increment = new decimal(new int[] {
-            128,
-            0,
-            0,
-            0});
-            this.memLimit.Location = new System.Drawing.Point(712, 249);
-            this.memLimit.Maximum = new decimal(new int[] {
-            4096,
-            0,
-            0,
-            0});
-            this.memLimit.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.memLimit.Name = "memLimit";
-            this.memLimit.Size = new System.Drawing.Size(62, 20);
-            this.memLimit.TabIndex = 29;
-            this.memLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.memLimit.Value = new decimal(new int[] {
-            4096,
-            0,
-            0,
-            0});
-            // 
             // statusStrip
             // 
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -349,7 +323,7 @@
             this.tbl_status});
             this.statusStrip.Location = new System.Drawing.Point(0, 514);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(820, 22);
+            this.statusStrip.Size = new System.Drawing.Size(870, 22);
             this.statusStrip.SizingGrip = false;
             this.statusStrip.TabIndex = 30;
             this.statusStrip.Text = "statusStrip1";
@@ -376,32 +350,13 @@
             this.tbl_status.Size = new System.Drawing.Size(439, 17);
             this.tbl_status.Text = "Completed: 0% Elapsed: 00:00:00 Remaining: 00:00:00 Speed: 0 nonces/m (0 MB/s)";
             this.tbl_status.Visible = false;
-            this.tbl_status.Click += new System.EventHandler(this.tbl_status_Click);
             this.tbl_status.TextChanged += new System.EventHandler(this.tbl_status_TextChanged);
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(600, 251);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(106, 13);
-            this.label8.TabIndex = 31;
-            this.label8.Text = "File Operation Cache";
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(780, 251);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(23, 13);
-            this.label10.TabIndex = 32;
-            this.label10.Text = "MB";
             // 
             // capacity
             // 
             this.capacity.Location = new System.Drawing.Point(472, 439);
             this.capacity.Name = "capacity";
-            this.capacity.Size = new System.Drawing.Size(170, 16);
+            this.capacity.Size = new System.Drawing.Size(190, 16);
             this.capacity.TabIndex = 34;
             // 
             // btn_plot
@@ -439,14 +394,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(820, 536);
+            this.ClientSize = new System.Drawing.Size(870, 536);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btn_optimize);
             this.Controls.Add(this.capacity);
-            this.Controls.Add(this.label10);
-            this.Controls.Add(this.label8);
             this.Controls.Add(this.statusStrip);
-            this.Controls.Add(this.memLimit);
             this.Controls.Add(this.tb_id);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.lbl_capa);
@@ -470,7 +422,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Johnny\'s BFSTool v.0.1";
             this.Load += new System.EventHandler(this.Form1_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.memLimit)).EndInit();
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
             this.ResumeLayout(false);
@@ -487,21 +438,21 @@
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader4;
         private System.Windows.Forms.ColumnHeader columnHeader3;
-        private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.ColumnHeader columnHeader6;
         private System.Windows.Forms.ColumnHeader columnHeader7;
+        private System.Windows.Forms.ColumnHeader columnHeader8;
         private System.Windows.Forms.Button btn_format;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ListView bfsView;
-        private System.Windows.Forms.ColumnHeader columnHeader9;
+        private System.Windows.Forms.ColumnHeader columnHeader10;
         private System.Windows.Forms.Button btn_upload;
         private System.Windows.Forms.Button btn_deleteFile;
         private System.Windows.Forms.Button btn_download;
-        private System.Windows.Forms.ColumnHeader columnHeader10;
         private System.Windows.Forms.ColumnHeader columnHeader11;
-        private System.Windows.Forms.ColumnHeader columnHeader13;
-        private System.Windows.Forms.Button btn_createEmptyPlotFile;
         private System.Windows.Forms.ColumnHeader columnHeader12;
+        private System.Windows.Forms.ColumnHeader columnHeader14;
+        private System.Windows.Forms.Button btn_createEmptyPlotFile;
+        private System.Windows.Forms.ColumnHeader columnHeader13;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox tb_version;
         private System.Windows.Forms.Label label4;
@@ -509,11 +460,8 @@
         private System.Windows.Forms.TextBox tb_id;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
-        private System.Windows.Forms.NumericUpDown memLimit;
-        private System.Windows.Forms.ColumnHeader columnHeader8;
+        private System.Windows.Forms.ColumnHeader columnHeader9;
         private System.Windows.Forms.StatusStrip statusStrip;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label10;
         private System.Windows.Forms.ProgressBar capacity;
         private System.Windows.Forms.Button btn_plot;
         private System.Windows.Forms.Button btn_optimize;
@@ -521,6 +469,7 @@
         private System.Windows.Forms.ToolStripProgressBar tbl_progress;
         private System.Windows.Forms.ToolStripStatusLabel tbl_status;
         private System.Windows.Forms.ToolStripStatusLabel tbl_x;
+        private System.Windows.Forms.ColumnHeader columnHeader5;
     }
 }
 

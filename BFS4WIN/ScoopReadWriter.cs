@@ -132,8 +132,11 @@ namespace BFS4WIN
             try
             {
                 //interrupt avoider 1mb write 64*16384
-                for (int i = 0; i < limit * 64; i += (64 * 16384))
-                    llda.Write(source.byteArrayField, i, Math.Min(64 * 16384, limit * 64 - i));
+                //for (int i = 0; i < limit * 64; i += (8 * 16384))
+                  //  llda.Write(source.byteArrayField, i, Math.Min(8 * 16384, limit * 64 - i));
+                //Justwrite
+                llda.Write(source.byteArrayField, 0, limit*64);
+
             }
             catch (Exception e)
             {
