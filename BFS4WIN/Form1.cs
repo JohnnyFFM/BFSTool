@@ -181,9 +181,9 @@ namespace BFS4WIN
             if (temp.id.ToString() != tb_id.Text) return;
 
             //calc startoffset and endoffset for 64 nonces alignment
-            UInt32 endOffset64 = temp.nonces - temp.nonces / 64 * 64;
             UInt64 startNonceR = temp.startNonce / 64 * 64;
             UInt64 startOffset64 = startNonceR < temp.startNonce ? startNonceR + 64 - temp.startNonce : 0;
+            UInt32 endOffset64 = temp.nonces - (UInt32)startOffset64 - (temp.nonces-(UInt32)startOffset64) / 64 * 64;
 
             //check last file and offer to insert dummy file
             //Todo
@@ -191,7 +191,7 @@ namespace BFS4WIN
 
 
             //Create file in bfsTOC
-            int file = BFS.AddPlotFile(drive, temp.startNonce+startOffset64,temp.nonces-endOffset64,2,0);
+            int file = BFS.AddPlotFile(drive, temp.startNonce+startOffset64,temp.nonces - (UInt32)startOffset64 - endOffset64,2,0);
             if (file > -1)
             {
                 FillBFSView(drive);
@@ -231,7 +231,7 @@ namespace BFS4WIN
             {
                 int zz = 0;
                 //loop partial scoop               
-                for (int z = 0; (ulong)z < temp.nonces/64*64; z += limit)
+                for (int z = (int)startOffset64; (ulong)z < temp.nonces-endOffset64; z += limit)
                 {
                     masterplan[y * loops + zz] = new TaskInfo();
                     masterplan[y * loops + zz].reader = reader;
@@ -354,14 +354,14 @@ namespace BFS4WIN
             //determine cache cycle and front scoop back scoop cycle to alternate
             if (ti.x % 2 == 0)
             {
-                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(ti.y, ti.src.nonces, ti.z, ti.scoop1, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
-                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(4095 - ti.y, ti.src.nonces, ti.z, ti.scoop2, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
+                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(ti.y, ti.src.nonces, ti.z, ti.scoop1, Math.Min((int)ti.src.nonces / 64 * 64 - ti.z, ti.limit));
+                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(4095 - ti.y, ti.src.nonces, ti.z, ti.scoop2, Math.Min((int)ti.src.nonces / 64 * 64 - ti.z, ti.limit));
                 if (ti.shuffle) Poc1poc2shuffle(ti.scoop1, ti.scoop2, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
             }
             else
             {
-                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(4095 - ti.y, ti.src.nonces, ti.z, ti.scoop4, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
-                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(ti.y, ti.src.nonces, ti.z, ti.scoop3, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
+                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(4095 - ti.y, ti.src.nonces, ti.z, ti.scoop4, Math.Min((int)ti.src.nonces / 64 * 64 - ti.z, ti.limit));
+                if (!halt1) halt1 = halt1 || !ti.reader.ReadScoop(ti.y, ti.src.nonces, ti.z, ti.scoop3, Math.Min((int)ti.src.nonces / 64 * 64 - ti.z, ti.limit));
                 if (ti.shuffle) Poc1poc2shuffle(ti.scoop3, ti.scoop4, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
             }
 
@@ -373,13 +373,13 @@ namespace BFS4WIN
             TaskInfo ti = (TaskInfo)stateInfo;
             if (ti.x % 2 == 0)
             {
-                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, (Int64)scoopOffset*64,(Int64)startOffset*64, ti.scoop1, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
-                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop2, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, (Int64)scoopOffset*64,(Int64)startOffset*64, ti.scoop1, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit));
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop2, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit));
             }
             else
             {
-                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop4, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
-                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop3, Math.Min((int)ti.src.nonces - ti.z, ti.limit));
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop4, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit));
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop3, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit));
             }
   
         }

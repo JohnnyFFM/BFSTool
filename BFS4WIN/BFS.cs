@@ -36,13 +36,19 @@ namespace BFS4WIN
         {
             Boolean test = true;
             //Check if first Partition is BFS
-            gpt = GPT.FromSectors(llda.ReadSector(drive, 0, 4096 * 5));
-            test = test && (gpt.gptPartitionTable.partitions[0].BFSParitionType == new Guid("53525542-4354-494F-4E46-494C45535953"));
-            //Check if BFSTOC v1 exists
-            bfsTOC = BFSTOC.FromSector(llda.ReadSector(drive, 5, 4096));
-            byte[] version = Encoding.ASCII.GetBytes("BFS1");
-            test = test && bfsTOC.version.SequenceEqual(version);
-            return test;
+            byte[] first;
+            first = llda.ReadSector(drive, 0, 4096 * 5);
+            if (first != null)
+            {
+                gpt = GPT.FromSectors(first);
+                test = test && (gpt.gptPartitionTable.partitions[0].BFSParitionType == new Guid("53525542-4354-494F-4E46-494C45535953"));
+                //Check if BFSTOC v1 exists
+                bfsTOC = BFSTOC.FromSector(llda.ReadSector(drive, 5, 4096));
+                byte[] version = Encoding.ASCII.GetBytes("BFS1");
+                test = test && bfsTOC.version.SequenceEqual(version);
+                return test;
+            }
+            return false;
         }
 
         public static int AddPlotFile(String drive, UInt64 start, UInt32 nonces, UInt32 status, UInt32 pos)

@@ -157,7 +157,8 @@ namespace BFS4WIN
             SafeFileHandle handleValue = CreateFile(drive, GENERIC_READ, 0, IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
             if (handleValue.IsInvalid)
             {
-                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+                //Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+                return 0;
             }
    
             Int64 DriveSize = 0;
@@ -194,7 +195,8 @@ namespace BFS4WIN
             SafeFileHandle handleValue = CreateFile(drive, GENERIC_READ, 0, IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
             if (handleValue.IsInvalid)
             {
-                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+                //Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+                return 0;
             }
             uint IOCTL_STORAGE_QUERY_PROPERTY = 0x002d1400;
             STORAGE_PROPERTY_QUERY storageQuery = new STORAGE_PROPERTY_QUERY();
@@ -242,7 +244,8 @@ namespace BFS4WIN
             SafeFileHandle handleValue = CreateFile(drive, GENERIC_READ, 0, IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
             if (handleValue.IsInvalid)
             {
-                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+                //Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+                return null;
             }
 
             //calculate byte position
@@ -290,7 +293,9 @@ namespace BFS4WIN
 
         public void Seek(Int64 position)
         {
-            Int64 filePos;           
+            Int64 filePos;
+            //debug 
+            if (position % 4096 != 0) Console.WriteLine("not aligned ERR!");
             if (!SetFilePointerEx(iFile, position, out filePos, EMoveMethod.Begin))
             {
                 Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
