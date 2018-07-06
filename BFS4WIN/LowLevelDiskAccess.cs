@@ -331,7 +331,7 @@ namespace BFS4WIN
             //calculate byte position
             Int64 sec = sector * bytesPerSector;
 
-            byte[] buf = new byte[bytesPerSector];
+            byte[] buf = new byte[bytesPerSector * number];
             Int64 filePos;
             if (!SetFilePointerEx(handleValue, sec, out filePos, EMoveMethod.Begin))
             {

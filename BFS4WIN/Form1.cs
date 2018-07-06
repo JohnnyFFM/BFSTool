@@ -216,7 +216,7 @@ namespace BFS4WIN
             writer.OpenW();
 
             //Allocate memory
-            int limit = Convert.ToInt32(PbytesPerSector) * 4096/1024; //Write cache, 1MB for 4k drives
+            int limit = 4096 * 4096/1024; //Write cache, 1MB 
             Scoop scoop1 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop
             Scoop scoop2 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop
             Scoop scoop3 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop
@@ -373,13 +373,13 @@ namespace BFS4WIN
             TaskInfo ti = (TaskInfo)stateInfo;
             if (ti.x % 2 == 0)
             {
-                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, (Int64)scoopOffset*64,(Int64)startOffset*64, ti.scoop1, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit));
-                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop2, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit));
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, (Int64)scoopOffset*64,ti.z, ti.scoop1, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit),(Int64) startOffset*64*64);
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, (Int64)scoopOffset * 64, ti.z, ti.scoop2, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit), (Int64)startOffset * 64 * 64);
             }
             else
             {
-                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop4, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit));
-                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop3, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit));
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop4, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit), (Int64)startOffset * 64 * 64);
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, (Int64)scoopOffset * 64, ti.z, ti.scoop3, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit), (Int64)startOffset * 64 * 64);
             }
   
         }

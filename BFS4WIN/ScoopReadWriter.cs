@@ -117,9 +117,9 @@ namespace BFS4WIN
             return true;
         }
 
-        public Boolean WriteScoop(int scoop, long totalNonces, long startNonce, Scoop source, int limit)
+        public Boolean WriteScoop(int scoop, long totalNonces, long startNonce, Scoop source, int limit, Int64 offset)
         {
-            _lPosition = scoop * (64 * totalNonces) + startNonce * 64;
+            _lPosition = scoop * (64 * totalNonces) + startNonce * 64 + offset;
             try
             {
                 llda.Seek(_lPosition);
