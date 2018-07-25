@@ -27,12 +27,23 @@ The table of contents comprises three elements, a header, a file table and a res
 
 ====BFS Header====
 The header is structured as follows:
-•	Version: "BFS1" (4 byte)		Version information
-•	CRC32: CRC32 (4 byte)			CRC32 of the complete TOC with this field set to zero 
-•	Disk size: UInt64 (8 byte)		Size of disk in 4k sectors
-•	Numerical ID: UInt64 (8 byte) 		Numerical ID for all files on the disk
-•	Number of files: UInt32 (4 byte)		Number of plot file segments in file table (standard = 72)
-•	Reserved: Empty (4 byte)
+
+{|
+|-
+! Field Name !! Content !! Size !! Comment
+|-
+| Version || "BFS1" || 4 byte || version information
+|-
+| CRC32 || CRC32  || 4 byte || CRC32 of the complete TOC with this field set to zero 
+|-
+| Disk size || UInt64 || 8 byte || Size of disk in 4k sectors
+|-
+| Numerical ID || UInt64 || 8 byte || Numerical ID for all files on the disk
+|-
+| Number of plot file segments || UInt32 || 4 byte || Number of plot file segments in file table (standard = 72)
+|-
+| Reserved || Empty || 4 byte || Size of disk in 4k sectors
+|}
 
 A standard TOC can hold up to 72 plot file segments. However, if more segments are needed, a TOC can be extended by adding further 4KiB sectors and increasing the number of files. To preserve the 4k alignment, another empty area between File Table and Reserved Area needs to be created. 
 
