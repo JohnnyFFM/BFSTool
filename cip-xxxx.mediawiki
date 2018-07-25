@@ -1,0 +1,29 @@
+<pre>
+  CIP: ?
+  Layer: Applications
+  Title: BFS
+  Author: JohnnyFFM
+  Comments-Summary: No comments yet.
+  Comments-URI: https://github.com/PoC-Consortium/CIPs/wiki/Comments:CIP-?
+  Status: Draft
+  Type: Process
+  Created: 2018-07-25
+</pre>
+
+==Abstract==
+BFS is a file system optimized for Burst. It features a light-weight table of contents (“TOC”) for minimal overhead, 
+a smart data fragmentation (“SDF”) ensuring that reading a scoop in a mining round is just a single seek and a big sequential read,
+sector alignment and 4KiB addressing for optimal performance on current hard drives and a bad sector handling mechanism. 
+BFS is operating system independent and can be embedded as a partition in any GPT formatted media. 
+
+==Motivation==
+Now with the current PoC used with Burstcoin, there indeed are time-memory tradeoffs possible.
+This attack on PoC mining fairness was possible in theory, but not feasible economically, because the PoW required for
+this mode of operation consumed far more energy than a PoC mining style.
+
+However recent advancements in hardware and GPU performance do show, that economical feasibility is just a matter of time.
+
+==Specification==
+
+===Compatibility===
+This is a hard forking change, thus breaks compatibility with old fully-validating node. It should not be deployed without widespread consensus.
