@@ -22,7 +22,7 @@ file system overhead (mostly unused space that could be used to store nonces), f
 ===BFS Scheme===
 A BFS partition comprises of only three elements: A primary table of contents (“TOC”) at the very beginning of the partition, the raw plot file data and a secondary table of contents at the very end of the partition as backup. To ensure TOC integrity, CRC32 is used. If the primary TOC is corrupted (e.g. due to a bad sector), the secondary TOC can be used. The physical distance between primary and secondary TOC is maximized to minimize failure correlation.
 
-[[File:CIP-XXXX-1.png|center|50px|BFS Partition Scheme]]
+<img src="CIP-XXXX-1.png" width="100" height="400"/>
 
 ===BFS Table of Contents===
 The table of contents comprises three elements, a header, a file table and a reserved area for future extensions. For drives with a physical sector size of 4KiB or any factor of 4KiB the standard size of the BFS TOC cluster is 4 KiB. The header size is 32 byte and the standard file table size is 1984 byte (for up to 72 plot file segments). The reserved area is 2 KiB in size. 
