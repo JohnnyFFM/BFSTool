@@ -159,11 +159,11 @@ The steps required for mining would be:
 The Miner can use finished plot file segments as well as files with status 3 ("plotting in progress"). 
 
 ===Limitations / Extensions===
-#PoC3 compatibility
+====PoC3 compatibility====
 It’s not clear yet how to support PoC3 files with BFS. 
-#	Support for 520b and alike
+====Support for 520b and alike====
 The BFS concept can be applied to drives with a sector size of 520b & 528b. All that needs to be done is to use a cluster size of 4160 byte for 520b and 4224 byte for 528b. The nonces constraint would then be 65 nonces for 520b and 66 nonces for 528b.
-# Performance
+====Performance====
 There is a downside to the optimized container approach: As performance is not homogenous for hard disks with spinning platters, transfer speeds depend on the physical location of data. The outer area of a hard disk platter performs better than the inner area. This affects scan time, scoop 0 is scanned at fastest speed, scoop 4095 at slowest speed. This might make it complicated to balance a large mining setup. A possible solution will be presented in a separate CIP.
 
 
