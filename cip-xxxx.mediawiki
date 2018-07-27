@@ -130,12 +130,11 @@ A BFS Partition can easily be embedded in a GPT structure. It is advised to crea
 
 The GPT is usually stored in the first 5 and last 5 4KiB sectors of a hard drive, resulting in an overhead of 40 KiB. 
 
-5.	Implementing BFS
+===Implementation===
+====Implementing BFS====
 There is two ways of implementing the BFS. Either the file system is implemented as a stack or one allows for fragmentation. However, since the number of file segments is limited, a stack should be preferred. 
 Just some note on file operations: 
 Merging adjacent plot file segments and splitting a plot file segment into several segments are just operations on the BFS TOC and can easily be implemented. 
-
-===Implementation===
 
 ====Implementing Plotting====
 The steps required for plotting would be:
@@ -149,12 +148,11 @@ The steps required for mining would be:
 #	Read the BFS TOC and extract file segment information
 #	Use direct I/O to access the drive using the extracted information (might require admin rights depending on OS)
 The Miner can use finished plot file segments as well as files with status 3 ("plotting in progress"). 
- 
-===Limitations / Extensions===
 
-;PoC3 compatibility
+===Limitations / Extensions===
+#PoC3 compatibility
 :It’s not clear yet how to support PoC3 files with BFS. 
-;	Support for 520b and alike
+#	Support for 520b and alike
 :The BFS concept can be applied to drives with a sector size of 520b & 528b. All that needs to be done is to use a cluster size of 4160 byte for 520b and 4224 byte for 528b. The nonces constraint would then be 65 nonces for 520b and 66 nonces for 528b.
-; Performance
+# Performance
 :
