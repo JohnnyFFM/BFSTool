@@ -22,7 +22,12 @@ file system overhead (mostly unused space that could be used to store nonces), f
 ===BFS Scheme===
 A BFS partition comprises of only three elements: A primary table of contents (“TOC”) at the very beginning of the partition, the raw plot file data and a secondary table of contents at the very end of the partition as backup. To ensure TOC integrity, CRC32 is used. If the primary TOC is corrupted (e.g. due to a bad sector), the secondary TOC can be used. The physical distance between primary and secondary TOC is maximized to minimize failure correlation.
 
-[[File:CIP-XXXX-2.png|center|BFS Partition Scheme]]
+[[File:CIP-XXXX-1.png|center|BFS Partition Scheme]]
+
+'''BFS Partition Scheme'''
+
+
+
 
 
 ===BFS Table of Contents===
