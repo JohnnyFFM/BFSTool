@@ -160,7 +160,7 @@ The Miner can use finished plot file segments as well as files with status 3 ("p
 
 ===Limitations / Extensions===
 ====PoC3 compatibility====
-It’s not clear yet how to support PoC3 files with BFS. 
+It’s not clear yet how to support PoC3 files with BFS. Most likely there will need to be an additonal parameter referencing the underlying data.  
 ====Support for 520b and alike====
 The BFS concept can be applied to drives with a sector size of 520b & 528b. All that needs to be done is to use a cluster size of 4160 byte for 520b and 4224 byte for 528b. The nonces constraint would then be 65 nonces for 520b and 66 nonces for 528b.
 ====Performance====
