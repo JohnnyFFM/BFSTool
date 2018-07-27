@@ -26,10 +26,6 @@ A BFS partition comprises of only three elements: A primary table of contents (�
 
 '''BFS Partition Scheme'''
 
-
-
-
-
 ===BFS Table of Contents===
 The table of contents comprises three elements, a header, a file table and a reserved area for future extensions. For drives with a physical sector size of 4KiB or any factor of 4KiB the standard size of the BFS TOC cluster is 4 KiB. The header size is 32 byte and the standard file table size is 1984 byte (for up to 72 plot file segments). The reserved area is 2 KiB in size. 
 
@@ -60,21 +56,42 @@ A standard TOC can hold up to 72 plot file segments. However, if more segments a
 
 A BFS file table comprises of 72 or more slots for plot file segments. A plot file segment is defined as a series of consecutive nonces. 
 Each slot (28 byte) contains: 
-•	startNonce: UInt64 (8 byte)		Starting nonce of the segment
-•	nonces: UInt32 (4 byte)			Number of nonces in the segment
-•	startPos: UInt64 (8 byte)		4k sector number where the plot file segment starts  
-•	status(32bit) 				plot file segment status, see below
-•	pos(32bit)				counter used for writing and plotting
+
+{|
+|-
+! StartNonce !! Content !! Size !! Comment
+|-
+| Nonces || UInt64 || 8 byte || Starting nonce of the segment
+|-
+| StartPos || UInt32  || 4 byte || Number of nonces in the segment
+|-
+| Status || UInt64 || 8 byte || 4k sector number where the plot file segment starts 
+|-
+| Status || UInt32 || 4 byte || plot file segment status, see below
+|-
+| Pos || UInt32 || 4 byte || counter used for writing and plotting
+|}
 
 Plot file segment status:
-      0 = EMPTY 	-> 		File slot empty
-      1 = OK -> 			File is ready to use
-      2 = WRITING -> 		File is incomplete. Current position is saved in parameter 'pos'.
-      3 = PLOTTING -> 		File is incomplete. Current nonce is saved in parameter 'pos'.
-      4 = CONVERTING -> 	File is incomplete. Current scoop is saved in parameter 'pos'.
-      5 = BAD --> 	File contains bad sectors, pos is split in 2x16bit (UInt16) representing start and end scoops of the damaged area that should be skipped when mining.
-NB: Plot data on BFS is supposed to be PoC2, PoC1 is not supported.
 
+{|
+|-
+! Status !! Description !! Comment
+|-
+| 0 || EMPTY || File slot empty
+|-
+| 1 || OK || File is ready to use
+|-
+| 2 || WRITING || File is incomplete. Current position is saved in parameter 'pos'.
+|-
+| 3 || PLOTTING || File is incomplete. Current nonce is saved in parameter 'pos'.
+|-
+| 4 || CONVERTING || File is incomplete. Current scoop is saved in parameter 'pos'.
+|-
+| 5 || BAD || File segments contains bad sectors, pos is split in 2x16bit (UInt16) representing start and end scoops of the damaged area that should be skipped when mining.
+|}
+
+NB: Plot data on BFS is supposed to be PoC2, PoC1 is not supported.
 
 ====Plot File Data and Fragmentation====
 
