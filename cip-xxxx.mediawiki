@@ -29,6 +29,10 @@ A BFS partition comprises of only three elements: A primary table of contents (�
 ===BFS Table of Contents===
 The table of contents comprises three elements, a header, a file table and a reserved area for future extensions. For drives with a physical sector size of 4KiB or any factor of 4KiB the standard size of the BFS TOC cluster is 4 KiB. The header size is 32 byte and the standard file table size is 1984 byte (for up to 72 plot file segments). The reserved area is 2 KiB in size. 
 
+[[File:CIP-XXXX-2.png|center|BFS Table of Contents Scheme]]
+
+'''BFS Table of Contents Scheme'''
+
 ====BFS Header====
 The header is structured as follows:
 
@@ -103,7 +107,10 @@ The downside of this constraint is overhead: The space of up to 63 nonces (~16MB
 ====Fragmentation====
 To store nonces, BFS uses a concept called optimized container. An optimized container is like a single big optimized plot file taking up the full plot file data area with an additional relaxation: Not all nonces need to be stored in consecutive order. The container can be divided into plot file segments and nonces only need to be in consecutive order within each plot file segment. Each plot file segment (FS) is referenced by an entry in the file table. 
 
-Data Fragmentation
+[[File:CIP-XXXX-3.png|center|Data Fragmentation]]
+
+'''Data Fragmentation'''
+
 
 The concept ensures that reading a scoop in a mining round is just a single seek and a big sequential read for optimal performance.
 There is also a downside of this approach: Hard disk performance is not homogenous, transfer speeds depend on the physical location of data. The outer area of a hard disk platter performs better than the inner area. This affects scan time, scoop 0 is scanned at fastest speed, scoop 4095 at slowest speed. This might make it complicated to balance a mining setup. A solution could be a drive parity, writing half of the drives of a mining system from scoop 0 to scoop 4095 and the other half from scoop 4095 down to scoop 0. This would result in a constant I/O performance across the full system. 
@@ -128,24 +135,26 @@ There is two ways of implementing the BFS. Either the file system is implemented
 Just some note on file operations: 
 Merging adjacent plot file segments and splitting a plot file segment into several segments are just operations on the BFS TOC and can easily be implemented. 
 
-===Implementing Plotting===
+===Implementation===
+
+====Implementing Plotting====
 The steps required for plotting would be:
-1.	Format a drive to BFS and set the Numeric ID
-2.	Create entries of plot file segments in the BFS TOC with status 3.
-3.	Start a BFS compatible plotter with just the physical drive identifier as parameter
+#	Format a drive to BFS and set the Numeric ID
+#	Create entries of plot file segments in the BFS TOC with status 3.
+#	Start a BFS compatible plotter with just the physical drive identifier as parameter
 The Plotter can read the BFS TOC, and can start to plot incomplete files. It can store the plotting progress in the TOC to allow for resuming. 
 
-===Implementing Mining===
+====Implementing Mining====
 The steps required for mining would be:
-1.	Read the BFS TOC and extract file segment information
-2.	Use direct I/O to access the drive using the extracted information (might require admin rights depending on OS)
-The Miner can use finished plot file segments as well as files with status 3 (“plotting in progress”). 
+#	Read the BFS TOC and extract file segment information
+#	Use direct I/O to access the drive using the extracted information (might require admin rights depending on OS)
+The Miner can use finished plot file segments as well as files with status 3 ("plotting in progress"). 
  
 ===Limitations / Extensions===
 
-5.1	PoC3 compatibility
-It’s not clear yet how to support PoC3 files with BFS. 
-5.2	Support for 520b and alike
-The BFS concept can be applied to drives with a sector size of 520b & 528b. All that needs to be done is to use a cluster size of 4160 byte for 520b and 4224 byte for 528b. The nonces constraint would then be 65 nonces for 520b and 66 nonces for 528b.
-5.3 Performance
-
+;PoC3 compatibility
+:It’s not clear yet how to support PoC3 files with BFS. 
+;	Support for 520b and alike
+:The BFS concept can be applied to drives with a sector size of 520b & 528b. All that needs to be done is to use a cluster size of 4160 byte for 520b and 4224 byte for 528b. The nonces constraint would then be 65 nonces for 520b and 66 nonces for 528b.
+; Performance
+:
