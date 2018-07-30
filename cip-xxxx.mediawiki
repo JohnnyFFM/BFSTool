@@ -20,7 +20,7 @@ file system overhead (mostly unused space that could be used to store nonces), f
 ==Specification==
 
 ===BFS Scheme===
-A BFS partition comprises of only three elements: A primary table of contents (“TOC”) at the very beginning of the partition, the raw plot file data and a secondary table of contents at the very end of the partition as backup. To ensure TOC integrity, CRC32 is used. If the primary TOC is corrupted (e.g. due to a bad sector), the secondary TOC can be used. The physical distance between primary and secondary TOC is maximized to minimize failure correlation.
+A BFS partition comprises three elements: A primary table of contents (“TOC”) at the very beginning of the partition, the raw plot file data and a secondary table of contents at the very end of the partition as backup. To ensure TOC integrity, CRC32 is used. If the primary TOC is corrupted (e.g. due to a bad sector), the secondary TOC can be used. The physical distance between primary and secondary TOC is maximized to minimize failure correlation.
 
 [[File:CIP-XXXX-1.png|center|BFS Partition Scheme]]
 
@@ -50,26 +50,26 @@ The header is structured as follows:
 |-
 | Number of plot file segments || UInt32 || 4 byte || Number of plot file segments in file table (standard = 72)
 |-
-| Reserved || Empty || 4 byte || Size of disk in 4k sectors
+| Reserved || Empty || || 
 |}
 
-A standard TOC can hold up to 72 plot file segments. However, if more segments are needed, a TOC can be extended by adding further 4KiB sectors and increasing the number of files. To preserve the 4k alignment, another empty area between File Table and Reserved Area needs to be created. 
+A standard TOC can hold up to 72 plot file segments. However, if more segments are needed, the TOC can be extended by adding further 4KiB sectors and increasing the number of files. To preserve the 4k alignment, another empty area between File Table and Reserved Area needs to be created. 
 
 
 ====BFS File Table====
 
-A BFS file table comprises of 72 or more slots for plot file segments. A plot file segment is defined as a series of consecutive nonces. 
+A BFS file table contains 72 or more slots for plot file segments. A plot file segment is defined as a series of consecutive nonces. 
 Each slot (28 byte) contains: 
 
 {|
 |-
-! StartNonce !! Content !! Size !! Comment
+! Contents !! Type !! Size !! Comment
 |-
-| Nonces || UInt64 || 8 byte || Starting nonce of the segment
+| StartNonce || UInt64 || 8 byte || Starting nonce of the segment
 |-
-| StartPos || UInt32  || 4 byte || Number of nonces in the segment
+| Nonces || UInt32  || 4 byte || Number of nonces in the segment
 |-
-| Status || UInt64 || 8 byte || 4k sector number where the plot file segment starts 
+| StartPos || UInt64 || 8 byte || 4k sector number where the plot file segment starts 
 |-
 | Status || UInt32 || 4 byte || plot file segment status, see below
 |-
@@ -82,17 +82,17 @@ Plot file segment status:
 |-
 ! Status !! Description !! Comment
 |-
-| 0 || EMPTY || File slot empty
+| 0 || EMPTY || Slot is empty
 |-
 | 1 || OK || File is ready to use
 |-
-| 2 || WRITING || File is incomplete. Current position is saved in parameter 'pos'.
+| 2 || WRITING || File is incomplete. Current position is saved in parameter 'Pos'.
 |-
-| 3 || PLOTTING || File is incomplete. Current nonce is saved in parameter 'pos'.
+| 3 || PLOTTING || File is incomplete. Current nonce is saved in parameter 'Pos'.
 |-
-| 4 || CONVERTING || File is incomplete. Current scoop is saved in parameter 'pos'.
+| 4 || CONVERTING || File is incomplete. Current scoop is saved in parameter 'Pos'.
 |-
-| 5 || BAD || File segments contains bad sectors, pos is split in 2x16bit (UInt16) representing start and end scoops of the damaged area that should be skipped when mining.
+| 9 || BAD || File segments contain bad sectors, Pos is split in 2x16bit (UInt16) representing start and end scoops of the damaged area that should be skipped when mining.
 |}
 
 NB: Plot data on BFS is supposed to be PoC2, PoC1 is not supported.
@@ -101,7 +101,7 @@ NB: Plot data on BFS is supposed to be PoC2, PoC1 is not supported.
 
 ====64 Nonces Constraint====
 To achieve optimal sector alignment, a 4 KiB cluster size based BFS only supports plot file segments containing multiples of 64 nonces. Adhering to this constraint simplifies direct I/O drive access.
-Background: In a mining round, 64 byte of each nonce (=one scoop) is being red. To optimize I/O load during mining, those 64 byte of each nonce are stored in sequence (concept of optimized plot files). As the smallest segment that can be red on modern drives without overhead is 4KiB, it makes sense to store only multiples of 64 nonces (64 nonces x 64 byte = 4KiB). It also ensures that each plot file segment starts at the beginning of a physical sector simplifying addressing.  
+Background: In a mining round, 64 byte of each nonce (=one scoop) is being read. To optimize I/O load during mining, those 64 byte of each nonce are stored in sequence (concept of optimized plot files). As the smallest segment that can be read on modern drives without overhead is 4KiB, it makes sense to store only multiples of 64 nonces (64 nonces x 64 byte = 4KiB). It also ensures that each plot file segment starts at the beginning of a physical sector simplifying addressing.  
 The downside of this constraint is overhead: The space of up to 63 nonces (~16MB) might remain unused. A workaround for this could be broken scoops. E.g. if there is only space for 63 nonces, the last 64 scoops can be shortened by one sector. 
 
 ====Fragmentation====
@@ -118,7 +118,7 @@ The concept ensures that reading a scoop in a mining round is just a single seek
 Bad sectors can be handled via the TOC. If a hard disk has a faulty area, all that needs to be done is to isolate the area in a plot file segment by splitting entries in the BFS file table and assign the status “bad”. 
  
 ===Creating a BFS partition inside a GPT===
-A BFS Partition can easily be embedded in a GPT structure. It is advised to create a proper partition for BFS to avoid confusing the operating system and prevent it from interfering. A GPT partition entry comprises of:
+A BFS Partition can easily be embedded in a GPT structure. It is advised to create a proper partition for BFS to avoid confusing the operating system and prevent it from interfering. A GPT partition entry consists of:
 
 {|
 |-
@@ -141,8 +141,8 @@ The GPT is usually stored in the first 5 and last 5 4KiB sectors of a hard drive
 
 ===Implementation===
 ====Implementing BFS====
-There is two ways of implementing the BFS. Either the file system is implemented as a stack or one allows for fragmentation. However, since the number of file segments is limited, a stack should be preferred. 
-Just some note on file operations: 
+There are two ways of implementing the BFS. Either the file system is implemented as a stack or one allows for fragmentation. However, since the number of file segments is limited, a stack should be preferred. 
+Just some notes on file operations: 
 Merging adjacent plot file segments and splitting a plot file segment into several segments are just operations on the BFS TOC and can easily be implemented. 
 
 ====Implementing Plotting====
@@ -150,7 +150,7 @@ The steps required for plotting would be:
 #	Format a drive to BFS and set the Numeric ID
 #	Create entries of plot file segments in the BFS TOC with status 3.
 #	Start a BFS compatible plotter with just the physical drive identifier as parameter
-The Plotter can read the BFS TOC, and can start to plot incomplete files. It can store the plotting progress in the TOC to allow for resuming. 
+The Plotter can read the BFS TOC, and can start to plot incomplete files. It can store the plotting progress in the TOC to allow resuming. 
 
 ====Implementing Mining====
 The steps required for mining would be:
