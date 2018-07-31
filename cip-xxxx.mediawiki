@@ -50,7 +50,7 @@ The header is structured as follows:
 |-
 | Number of plot file segments || UInt32 || 4 byte || Number of plot file segments in file table (standard = 72)
 |-
-| Reserved || Empty || || 
+| Reserved || Empty || 4byte || 
 |}
 
 A standard TOC can hold up to 72 plot file segments. However, if more segments are needed, the TOC can be extended by adding further 4KiB sectors and increasing the number of files. To preserve the 4k alignment, another empty area between File Table and Reserved Area needs to be created. 
