@@ -102,8 +102,7 @@ NB: Plot data on BFS is supposed to be PoC2, PoC1 is not supported.
 ====64 Nonces Constraint====
 To achieve optimal sector alignment, a 4 KiB cluster size based BFS only supports plot file segments containing multiples of 64 nonces. Adhering to this constraint simplifies direct I/O drive access.
 Background: In a mining round, 64 byte of each nonce (=one scoop) is being read. To optimize I/O load during mining, those 64 byte of each nonce are stored in sequence (concept of optimized plot files). As the smallest segment that can be read on modern drives without overhead is 4KiB, it makes sense to store only multiples of 64 nonces (64 nonces x 64 byte = 4KiB). It also ensures that each plot file segment starts at the beginning of a physical sector simplifying addressing.  
-The downside of this constraint is overhead: The space of up to 63 nonces (~16MB) might remain unused. A workaround for this could be broken scoops. E.g. if there is only space for 63 nonces, the last 64 scoops can be shortened by one sector. 
-
+The downside of this constraint is overhead: The space of up to 63 nonces (~16MB) might remain unused.
 ====Fragmentation====
 To store nonces, BFS uses a concept called optimized container. An optimized container is like a single big optimized plot file taking up the full plot file data area with an additional relaxation: Not all nonces need to be stored in consecutive order. The container can be divided into plot file segments and nonces only need to be in consecutive order within each plot file segment. Each plot file segment (FS) is referenced by an entry in the file table. 
 
