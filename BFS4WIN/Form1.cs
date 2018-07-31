@@ -216,7 +216,8 @@ namespace BFS4WIN
             writer.OpenW();
 
             //Allocate memory
-            int limit = 4096 * 4096/1024; //Write cache, 1MB 
+            //int limit = 4096 * 4096/1024; //Write cache, 1MB 
+            int limit = Convert.ToInt32(4096 - 3) *4 *64;
             Scoop scoop1 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop
             Scoop scoop2 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop
             Scoop scoop3 = new Scoop(Math.Min((Int32)temp.nonces, limit));  //space needed for one partial scoop
@@ -373,12 +374,12 @@ namespace BFS4WIN
             TaskInfo ti = (TaskInfo)stateInfo;
             if (ti.x % 2 == 0)
             {
-                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, (Int64)scoopOffset*64,ti.z, ti.scoop1, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit),(Int64) startOffset*64*64);
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, (Int64)scoopOffset * 64,ti.z, ti.scoop1, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit),(Int64) startOffset*64*64);
                 if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, (Int64)scoopOffset * 64, ti.z, ti.scoop2, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit), (Int64)startOffset * 64 * 64);
             }
             else
             {
-                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, (Int64)scoopOffset * 64, (Int64)startOffset * 64, ti.scoop4, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit), (Int64)startOffset * 64 * 64);
+                if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(4095 - ti.y, (Int64)scoopOffset * 64, ti.z, ti.scoop4, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit), (Int64)startOffset * 64 * 64);
                 if (!halt2) halt2 = halt2 || !ti.writer.WriteScoop(ti.y, (Int64)scoopOffset * 64, ti.z, ti.scoop3, Math.Min((int)ti.src.nonces - ti.startOffset64 - ti.endOffset64 - ti.z, ti.limit), (Int64)startOffset * 64 * 64);
             }
   
@@ -467,7 +468,7 @@ namespace BFS4WIN
             btn_createEmptyPlotFile.Enabled = true;
             btn_deleteFile.Enabled = true;
             btn_upload.Enabled = true;
-            btn_download.Enabled = true;
+            //btn_download.Enabled = true;
 
             if (drivesView.SelectedItems.Count > 0)
             {
